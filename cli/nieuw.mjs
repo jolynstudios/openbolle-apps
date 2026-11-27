@@ -59,8 +59,8 @@ export async function nieuw(args) {
 Zo ga je verder:
   cd ${rel}
   ${AANROEP} sleutel       één keer: je sleutel en de code van je winkel
-  ${AANROEP} controleer    kijk of het profiel klopt
   ${AANROEP} onderteken    na elke wijziging van profiel.json
+  ${AANROEP} controleer    controleer het profiel en de handtekening
   ${AANROEP} winkel        maak winkel.json: dat adres voegen mensen toe op Bolle
 
 Pas profiel.json aan (de app, de woorden en de meldingen) en probeer het in de simulator:

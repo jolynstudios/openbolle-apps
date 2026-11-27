@@ -1,7 +1,7 @@
 {
   "name": "openbolle-apps",
   "version": "1.0.0",
-  "description": "openBolle-apps maken, lokaal draaien, controleren, ondertekenen en in je eigen winkel zetten: npx github:jolynstudios/openbolle-apps nieuw|dev|controleer|sleutel|onderteken|winkel|installeer",
+  "description": "openBolle-apps maken, lokaal draaien, ondertekenen, controleren en in je eigen winkel zetten: npx github:jolynstudios/openbolle-apps nieuw|dev|sleutel|onderteken|controleer|winkel|installeer",
   "private": true,
   "license": "MIT",
   "type": "module",

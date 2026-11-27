@@ -118,7 +118,7 @@ export function accessoireFouten(map, m, { getekend = true } = {}) {
   } else if (!getekend) fout("profiel.json ontbreekt");
   if (f.length || !getekend || typeof m.profiel !== "string") return f;
   const uit = join(map, m.profiel), sig = join(map, m.handtekening);
-  if (!existsSync(uit) || !existsSync(sig)) { fout(`nog niet ondertekend (${m.profiel} of ${m.handtekening} ontbreekt): ${AANROEP} onderteken`); return f; }
+  if (!existsSync(uit) || !existsSync(sig)) { fout(`nog niet ondertekend (${m.profiel} of ${m.handtekening} ontbreekt): voer eerst onderteken uit met ${AANROEP} onderteken`); return f; }
   const data = readFileSync(uit);
   let q;
   try { q = JSON.parse(data.toString("utf8")); } catch { fout(`${m.profiel} is geen geldige JSON`); return f; }

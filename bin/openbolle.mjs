@@ -37,6 +37,9 @@ Accessoire-apps en je eigen winkel:
   onderteken [map ...] [--sleutel pad]
       Maakt van profiel.json het ondertekende profiel (dist/profiel.json en .sig). Na elke wijziging.
 
+  controleer [map ...]
+      Controleert het ondertekende profiel. Maak daarna je winkel met de volgende opdracht.
+
   winkel [map] [--controleer] [--dev]
       Maakt winkel.json uit winkel.yaml: de apps in de map zelf en die uit 'bronnen' (je andere repo's, op een
       vaste tag of commit). Zo heeft één maker één winkel. --controleer kijkt alleen of winkel.json bijgewerkt is.
