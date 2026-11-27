@@ -3,7 +3,7 @@
 manifest: 1
 id: homey
 naam: Homey
-versie: 1.2.0
+versie: 1.3.0
 auteur:
   naam: openBolle
   email: plugins@openbolle.nl
@@ -85,6 +85,19 @@ tools:
       required: [apparaat, actie]
     rijden: true
     max_tekens: 300
+  - naam: helderheid
+    beschrijving: >
+      Dim een lamp of kamer. "Woonkamerlicht iets zachter" verlaagt de huidige helderheid;
+      "zet de woonkamerlamp op 30%" kiest een vaste stand. Voor aan en uit gebruik je bedien.
+    parameters:
+      type: object
+      properties:
+        apparaat: { type: string, description: "Naam van de lamp of kamer, bijvoorbeeld woonkamer" }
+        richting: { type: string, enum: [op, zachter, feller] }
+        procent: { type: number, minimum: 0, maximum: 100, description: "Bij op verplicht. Bij zachter of feller een stap in procentpunten; weglaten voor 10 punten." }
+      required: [apparaat, richting]
+    rijden: true
+    max_tekens: 400
   - naam: beveiliging
     beschrijving: >
       Slot, alarm of garagedeur bedienen. Vraag altijd eerst bevestiging. Kan niet tijdens het rijden.

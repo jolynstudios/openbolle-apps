@@ -28,6 +28,27 @@ class Blok(unittest.TestCase):
     def tearDown(self):
         plugin.lees, plugin.homey = self.oud
         plugin.sessies.clear(); plugin._gebruiker_cache.clear(); plugin._flow_cache.clear(); plugin._mood_cache.clear()
+    def test_dim_room_relative_and_absolute(self):
+        lights = [dev("one", "Leeslamp", "light", dim=0.06), dev("two", "Spots", "light", dim=0.82)]
+        for lamp in lights:
+            lamp["_kamer"] = "Woonkamer"
+        plugin.lees = lambda ctx: lights
+        for direction, extra, expected in [("zachter", {}, [0, 0.72]), ("feller", {"procent": 25}, [0.31, 1]),
+                                           ("op", {"procent": 30}, [0.3, 0.3])]:
+            self.aanroepen.clear()
+            plugin.helderheid({}, dict(apparaat="woonkamerlamp", richting=direction, **extra))
+            self.assertEqual([v["value"] for _, _, v in self.aanroepen], expected)
+
+    def test_dim_rejects_unknown_readonly_and_invalid(self):
+        light = dev("lamp", "Spots", "light", dim=None)
+        plugin.lees = lambda ctx: [light]
+        plugin.helderheid({}, {"apparaat": "Spots", "richting": "zachter"})
+        plugin.helderheid({}, {"apparaat": "Spots", "richting": "op"})
+        plugin.helderheid({}, {"apparaat": "Spots", "richting": "op", "procent": 101})
+        light["capabilitiesObj"]["dim"]["setable"] = False
+        plugin.helderheid({}, {"apparaat": "Spots", "richting": "op", "procent": 30})
+        self.assertFalse(self.aanroepen)
+
     def blok(self, devs):
         plugin.lees = lambda ctx, max_oud_s=0: devs
         return plugin.blok({"installatie": "ins"}, "huis")

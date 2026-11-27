@@ -146,6 +146,51 @@ def bedien(ctx, a):
     wat = {"onoff": "aan" if waarde is True else "uit", "dim": f"op {round(waarde * 100)}%", "target_temperature": f"op {waarde:g} graden"}[cap]
     return f"Gedaan: {', '.join(gelukt)} {wat}."
 
+def helderheid(ctx, a):
+    richting = a.get("richting")
+    procent = a.get("procent", 10 if richting in ("zachter", "feller") else None)
+    if richting not in ("op", "zachter", "feller") or type(procent) not in (int, float) or not 0 <= procent <= 100:
+        return "Geef een helderheid tussen 0 en 100 procent of zeg zachter of feller."
+    naam = a.get("apparaat")
+    if not isinstance(naam, str) or not naam.strip():
+        return "Welke lamp of kamer bedoel je?"
+    devs = lees(ctx)
+    # First resolve the user's target. Never broaden a named non-dimmable lamp to its room.
+    kies, kamer = zoek(devs, naam)
+    if not kies:
+        kamernaam = re.sub(r"(?:lamp(?:en)?|licht(?:en)?)$", "", naam.strip(), flags=re.I).strip()
+        if norm(kamernaam) and kamernaam != naam:
+            kies = [d for d in devs if norm(d["_kamer"]) == norm(kamernaam)]
+            kamer = True
+    if not kamer and len(kies) > 1:
+        return "Meerdere apparaten gevonden. Welke lamp bedoel je?"
+    dimbaar = []
+    for d in kies:
+        cap = (d.get("capabilitiesObj") or {}).get("dim") or {}
+        if d.get("class") not in BEVEILIGING and (not kamer or d.get("class") in ("light", "socket")) and cap and cap.get("setable") is not False:
+            dimbaar.append((d, cap.get("value")))
+    if not dimbaar or len(dimbaar) > 8:
+        return "Geen dimbaar apparaat gevonden." if not dimbaar else "Noem een kleinere groep lampen."
+    gelukt = []
+    for d, oud in dimbaar:
+        doel = procent / 100
+        if richting != "op":
+            if type(oud) not in (int, float) or not 0 <= oud <= 1:
+                continue
+            doel = max(0, min(1, oud + (doel if richting == "feller" else -doel)))
+        try:
+            homey(ctx, f"/devices/device/{d['id']}/capability/dim", "PUT", {"value": round(doel, 4)})
+            gelukt.append(f"{d['name']} op {round(doel * 100)}%")
+        except Exception:
+            continue
+    if not gelukt:
+        return "Het dimmen is niet gelukt."
+    antwoord = ", ".join(gelukt) + "."
+    if len(gelukt) < len(dimbaar):
+        antwoord += " Niet alle lampen konden worden ingesteld."
+    return antwoord
+
+
 def beveiliging(ctx, a):
     actie = a.get("actie")
     caps = {"op_slot": ("locked", True), "van_slot": ("locked", False), "dicht": ("garagedoor_closed", True),
@@ -187,7 +232,7 @@ def sfeer(ctx, a):
     homey(ctx, f"/moods/mood/{kies[0]['id']}/set", "POST", {})
     return f"Sfeer '{kies[0]['name']}' staat aan."
 
-TOOLS = {"apparaten": apparaten, "bedien": bedien, "beveiliging": beveiliging, "flow_starten": flow_starten, "sfeer": sfeer}
+TOOLS = {"apparaten": apparaten, "bedien": bedien, "helderheid": helderheid, "beveiliging": beveiliging, "flow_starten": flow_starten, "sfeer": sfeer}
 KOPPELEN = "Homey is nog niet gekoppeld. Zeg: open op Bolle Menu, Apps, Homey, en scan de QR-code met je telefoon."
 
 # Alarmen in huis die Bolle uit zichzelf meldt (recht meldingen:sturen), het ernstigste eerst: capability -> titel
