@@ -339,7 +339,8 @@ def blok(ctx, bid):
         g = open_[0]
         schermen.append({"soort": "vraag", "titel": "Garage", "vraag": {"tekst": kort_tekst(f"{g['name']} staat open. Dicht doen?", 60),
                          "uitleg": kort_tekst(g["_kamer"] or "Garagedeur", 60), "ja": "Dicht", "nee": "Laat", "actie": f"g-{kort_id(g)}"}})
-    if gekozen: schermen.append({"soort": "lijst", "titel": "Thuis", "rijen": [rij(d) for d in gekozen[:6]]})
+    for i in range(0, min(len(gekozen), 8), 4):                     # Bolle toont 4 rijen per lijst: meer = een tweede lijst
+        schermen.append({"soort": "lijst", "titel": "Thuis" if i == 0 else "Thuis 2", "rijen": [rij(d) for d in gekozen[i:i + 4]]})
     if fav_f:
         try: fl = {f["id"]: (f, soort) for f, soort in flows_kort(ctx)}
         except Exception: fl = {}

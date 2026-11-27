@@ -7,7 +7,7 @@
   {
    "id": "homey",
    "naam": "Homey",
-   "versie": "1.3.0",
+   "versie": "1.3.1",
    "soort": "server",
    "kort": "Je huis bedienen vanuit de auto",
    "lang": "Bedien je Homey Pro met je stem: lampen, stekkers en de thermostaat, flows starten en sferen kiezen. Een slot, het alarm of de garagedeur alleen na bevestiging en nooit tijdens het rijden. Gaat thuis een rookmelder, koolmonoxide- of watermelder af, dan meldt Bolle het. Op het scherm van Bolle (als je stilstaat): je favoriete apparaten aan of uit, je favoriete flows of je sferen starten en een open garagedeur dicht doen. Koppelen: installeer de app, kies op Bolle Menu > Apps > Homey > Koppelen en scan de QR-code met je telefoon.",
