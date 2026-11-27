@@ -1,0 +1,135 @@
+# Kilometers: zakelijke en privéritten bijhouden met je stem (kilometerregistratie voor de auto van de zaak).
+# Geen internet: alles staat in de opslag van de broker, per installatie (opslag:klein).
+manifest: 1
+id: kilometers
+naam: Kilometers
+versie: 1.1.0
+auteur:
+  naam: openBolle
+  email: plugins@openbolle.nl
+  github: openbolle
+  url: https://openbolle.nl
+licentie: MIT
+beschrijving:
+  kort: Zakelijke en privéritten bijhouden
+  lang: >
+    Houd je zakelijke en privékilometers bij met je stem, handig voor een lease- of bedrijfsauto. Zeg bij vertrek
+    "noteer een zakelijke rit naar Utrecht, kilometerstand 45230" en bij aankomst de eindstand, of noteer een hele rit
+    in één keer. Bolle telt per maand en per jaar op, zakelijk en privé apart. De app bewaart de laatste 100 ritten
+    en de totalen per maand; het is een hulpmiddel, geen volledige rittenadministratie voor de Belastingdienst.
+categorie: auto
+pictogram: route
+logo: logo.png
+voorbeelden:
+  - Noteer een zakelijke rit, kilometerstand 45230
+  - De rit is klaar, eindstand 45318
+  - Noteer 24 kilometer privé naar de sportschool
+  - Hoeveel zakelijke kilometers deze maand?
+  - Wis de laatste rit
+
+vereist:
+  bolleos: ">=0.3.5"
+  platform: ">=1.0 <2"
+  blokken: 1
+
+runtime:
+  taal: python
+  geheugen_mb: 48
+  cpu: 0.1
+  tijdslimiet_ms: 3000
+  opslag_kb: 16           # één sleutel 'ritten': hooguit 100 ritten + totalen van 25 maanden, ruim onder 16 KB
+
+rechten:
+  - spraak:tools
+  - blokken:tonen
+  - opslag:klein
+# geen internet, geen locatie, geen rit:status: alleen wat je zelf zegt
+
+tools:
+  - naam: rit_start
+    beschrijving: >
+      Begin van een rit noteren: zakelijk of privé, de kilometerstand bij vertrek en eventueel de bestemming of het
+      doel. Gebruik dit als de gebruiker vertrekt en de beginstand noemt ("noteer een zakelijke rit naar Utrecht,
+      kilometerstand 45230"). Noemt hij een hele rit in één keer (afstand, of begin- en eindstand), gebruik rit_noteer.
+    parameters:
+      type: object
+      required: [soort, beginstand]
+      properties:
+        soort: { type: string, enum: [zakelijk, privé], description: "zakelijk of privé. Woon-werkverkeer telt voor de auto van de zaak als zakelijk." }
+        beginstand: { type: integer, description: "Kilometerstand bij vertrek, in hele km" }
+        doel: { type: string, description: "Bestemming of doel van de rit, kort, bijvoorbeeld 'Utrecht, klant Jansen'" }
+    rijden: true
+    max_tekens: 250
+  - naam: rit_einde
+    beschrijving: >
+      Einde van de lopende rit noteren met de kilometerstand bij aankomst; geeft de gereden afstand. Gebruik dit bij
+      "ik ben er, eindstand 45318", "rit klaar, de teller staat op ...". Alleen als er een rit loopt (begonnen met
+      rit_start).
+    parameters:
+      type: object
+      required: [eindstand]
+      properties:
+        eindstand: { type: integer, description: "Kilometerstand bij aankomst, in hele km" }
+        doel: { type: string, description: "Bestemming of doel, als die bij het begin nog niet genoemd was" }
+    rijden: true
+    max_tekens: 250
+  - naam: rit_noteer
+    beschrijving: >
+      Een hele rit in één keer noteren: zakelijk of privé, met de afstand in km of met begin- en eindstand, en
+      eventueel het doel. Gebruik dit bij "noteer 24 kilometer privé naar de sportschool" of "zakelijke rit van 45230
+      tot 45318". Voor alleen een beginstand: rit_start.
+    parameters:
+      type: object
+      required: [soort]
+      properties:
+        soort: { type: string, enum: [zakelijk, privé], description: "zakelijk of privé. Woon-werkverkeer telt voor de auto van de zaak als zakelijk." }
+        km: { type: number, description: "Gereden afstand in km (als er geen begin- en eindstand zijn)" }
+        beginstand: { type: integer, description: "Kilometerstand bij vertrek" }
+        eindstand: { type: integer, description: "Kilometerstand bij aankomst" }
+        doel: { type: string, description: "Bestemming of doel van de rit, kort" }
+    rijden: true
+    max_tekens: 250
+  - naam: kilometers_overzicht
+    beschrijving: >
+      Hoeveel kilometer er zakelijk en privé is gereden, met het aantal ritten: deze maand, vorige maand of dit jaar,
+      en of er nu een rit loopt. Gebruik dit bij "hoeveel zakelijke kilometers deze maand", "hoeveel privé dit jaar",
+      "wat was mijn laatste rit". Alleen ritten die met deze app zijn genoteerd.
+    parameters:
+      type: object
+      properties:
+        periode: { type: string, enum: [deze_maand, vorige_maand, dit_jaar], description: "Standaard deze_maand" }
+    rijden: true
+    max_tekens: 400
+  - naam: laatste_rit_wissen
+    beschrijving: >
+      Wist de lopende rit als er een loopt, en anders de laatst genoteerde rit (ook uit de totalen). Gebruik dit
+      alleen als de gebruiker zegt dat de laatste rit fout is of gewist moet worden ("wis de laatste rit", "die rit
+      klopt niet, haal hem weg"). Niet om een rit af te sluiten (rit_einde).
+    parameters:
+      type: object
+      properties: {}
+    bevestigen: true
+    rijden: true
+    max_tekens: 200
+
+blokken:
+  - id: kilometers
+    soort: tegel
+    titel: Kilometers
+    pictogram: route
+    verversen_s: 300
+    rijden: eenregel
+    hoofdscherm: true
+
+privacy:
+  doel: Je zakelijke en privéritten bijhouden en optellen, voor je eigen kilometerregistratie.
+  gegevens:
+    - Per rit wat je zelf zegt - datum, zakelijk of privé, begin- en eindstand of afstand, en het doel of de bestemming - bewaard in de opslag van de broker van openBolle (hooguit de laatste 100 ritten)
+    - Totalen per maand (zakelijk en privé), van de laatste 25 maanden
+    - Niet je locatie; de app heeft geen internet
+  bewaartermijn: Tot je de rit wist, hij als oudste uit de laatste 100 valt, of je de app verwijdert; dan wordt alles gewist.
+  derden: []
+presentatie:
+  afbeeldingen:
+    - bestand: afbeeldingen/scherm.png
+      uitleg: "Je zakelijke en privékilometers van deze maand en dit jaar, met je stem bijgehouden."

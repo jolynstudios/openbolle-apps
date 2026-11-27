@@ -1,0 +1,22 @@
+{
+  "name": "audi",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "bouw": "tsc",
+    "start": "node dist/plugin.js",
+    "dev": "tsc && node dist/plugin.js",
+    "kopie": "node controleer-kopie.mjs",
+    "test": "tsc && node --test test/stand.test.mjs",
+    "nep": "node test/nep-audi.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "~6.0.3"
+  }
+}

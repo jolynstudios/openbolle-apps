@@ -1,0 +1,34 @@
+{
+  "profiel": 1,
+  "id": "mijn-accessoire",
+  "naam": "Mijn accessoire",
+  "versie": "1.0.0",
+  "kort": "De meldingen van een app op je telefoon op Bolle",
+  "rechten": "Bolle leest de pushmeldingen van deze app en toont ze als melding.",
+  "koppel_uitleg": "Koppel je iPhone met Bolle in Instellingen > Bluetooth en sta meldingen toe.",
+  "bluetooth": {
+    "naam": "BOLLE",
+    "fabrikant": "Jouw naam",
+    "model": "Mijn accessoire",
+    "serienummer": "0001",
+    "firmware": "1.0",
+    "software": "mijn-accessoire 1.0",
+    "dienst": "00000000-0000-4000-8000-000000000000",
+    "kenmerken": [
+      {"uuid": "00000001-0000-4000-8000-000000000000", "rol": "animatie", "eigenschappen": ["schrijven", "schrijven_zonder_antwoord"]},
+      {"uuid": "00000002-0000-4000-8000-000000000000", "rol": "knoppen", "eigenschappen": ["lezen", "melden"]}
+    ]
+  },
+  "standaard": {"titel": "Melding", "icoon": "info", "kleur": "info"},
+  "kleuren": [],
+  "demo": [],
+  "meldingen": {
+    "app": "com.voorbeeld.app",
+    "negeer": ["aanbieding", "nieuwsbrief"],
+    "regels": [
+      {"bevat": ["klaar", "voltooid", "complete"], "titel": "KLAAR", "kleur": "ok"},
+      {"bevat": ["waarschuwing", "warning"], "titel": "LET OP", "kleur": "gevaar"}
+    ],
+    "anders": {"titel": "MELDING", "kleur": "#ECF0F5"}
+  }
+}

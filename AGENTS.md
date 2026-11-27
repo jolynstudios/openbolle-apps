@@ -1,0 +1,28 @@
+# Build an app for openBolle
+
+Start by describing one thing the person should be able to see or do. Choose where the work belongs. A server app runs code online. An accessory app gives Bolle a signed set of rules to read messages from a phone. If the idea needs an online API and Bluetooth messages, build two apps with their own IDs. Use the public CLI and files in this repo. The [agent guides](https://openbolle.nl/docs/ontwikkelen/ai-agents) cover each app type. The [Markdown index](https://openbolle.nl/llms.txt) lists their current direct links.
+
+Use Node.js 22 or newer. Python examples also need Python 3. In examples below, replace the sample ID with a stable lowercase ID of 3 to 32 characters, starting with a letter and using letters, digits and hyphens. Write README files in English. Write device labels, example questions, answers and tool descriptions in Dutch. Tell the owner which checks you ran.
+
+## Build a server app
+
+1. Start from one working example. Run `npx github:jolynstudios/openbolle-apps nieuw mijn-app` for Python or add `--taal typescript`. Enter the new directory. Describe the tools, settings, permissions and screens in `app.yaml`. Implement them in `plugin.py` or `src/plugin.ts`. The names in code must match the manifest. The [manifest schema](schema/app.schema.json) defines accepted fields.
+2. Use the starter's HTTP service on port 8080. Keep its `GET /gezond` health check. Voice tools use `POST /mcp` for tool listing and calls. For a screen, return a block from `POST /blok/<id>`. Bolle draws your value, cards, question, list or buttons. For an allowed tap, handle `POST /actie`. Return a short Dutch result. Use the [TypeScript helpers](sdk/typescript/) or [Python example](sjabloon/mijnapp/).
+3. Ask only for the rights the feature needs. Access storage, platform data or an OAuth access token through the broker using the context for this call. The file system is read-only in production. Request outside hosts in the manifest and use the platform's proxy. Keep credentials and personal data out of code and logs. Set `bevestigen: true` for actions with real-world consequences. Disable unsafe actions while driving.
+4. Run `npx github:jolynstudios/openbolle-apps controleer --contract --lokaal`. Start `npx github:jolynstudios/openbolle-apps dev`. Open the address it prints. Call the example tool with a concrete input. For a screen, try one tap and check that a driving restriction works if applicable.
+5. In the [simulator workbench](https://openbolle.nl/simulator#bouwen), choose **Apps**, connect to the local server and allow local network access if the browser asks. Select **Installeren in simulator**. Scroll to **Toestaan** on the round screen. Run a tool and check the actual reply. Keep the server running throughout.
+6. For a physical preview, enable **Menu → Systeem → Debug** on the device and let it restart. Connect a USB data cable. Stop the previous server and start `npx github:jolynstudios/openbolle-apps dev --bolle`. The app continues running on the computer. Record separately whether the device showed the screen. For publication, follow [Contributing](CONTRIBUTING.md).
+
+## Build an accessory app
+
+1. Ask for the phone app, an authorised sample notification or Bluetooth message, and what Bolle should show. For direct Bluetooth traffic, get the service IDs, characteristic IDs and byte layout the phone expects. Use marked sample data while these are unknown.
+2. Run `npx github:jolynstudios/openbolle-apps nieuw mijn-accessoire --soort accessoire`. Enter the new directory. Edit `profiel.json` and the app details in `app.yaml`. Use the [accessory starter](sjabloon/mijnaccessoire/). Keep the generated Bluetooth IDs for a new protocol. Use the phone app's documented IDs when implementing an existing one.
+3. A notification rule matches the sending app and words in its text. A direct Bluetooth rule maps bytes to a device event. Use the sounds and icons from [the device vocabulary](schema/bolleos.json). Keep profile and manifest IDs and versions in sync. Raise both versions before a release.
+4. Choose **Accessoire-apps** in the [simulator](https://openbolle.nl/simulator#bouwen). Load your profile. Send one known event and one that should be ignored. Record what appears in the log and on screen. Actual pairing requires a physical Bolle and the phone app.
+5. For a private unsigned trial, enable device debug mode, let Bolle restart and attach a data cable. Run `npx github:jolynstudios/openbolle-apps installeer --zonder-handtekening`. Check receipt of a real phone event. This command writes a profile to the device. Confirm with the device owner before using it.
+6. For distribution, use the maker's existing store key, or arrange creation of a new one with the maker. Keep the private key outside the repo. Run the CLI commands `onderteken`, `controleer`, `winkel`, then `winkel --controleer` in that order. Sign again after every change. Distribute the signed profile, signature, public key and store index together. Before a signed USB test, add the store on the setup page and compare the key code. Use `installeer` for that test.
+7. Describe who runs the store and how to add it. [Contributing](CONTRIBUTING.md) explains how to register a store with the maintainers. People choose which stores they trust.
+
+## Hand the result back
+
+Give the maker the commands, the test input, the expected response and the response you saw. Name any physical-device test that remains. Share drafts and test results first. Keep signing keys private and get approval before publishing or deploying. The [Dutch development guide](https://openbolle.nl/docs/ontwikkelen/) has the full walkthrough.

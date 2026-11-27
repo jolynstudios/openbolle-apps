@@ -1,0 +1,23 @@
+{
+ "access": {
+  "accessStatus": {
+   "error": {
+    "message": "upstream"
+   }
+  }
+ },
+ "fuelStatus": {
+  "rangeStatus": {
+   "error": {
+    "message": "upstream"
+   }
+  }
+ },
+ "measurements": {
+  "odometerStatus": {
+   "error": {
+    "message": "upstream"
+   }
+  }
+ }
+}

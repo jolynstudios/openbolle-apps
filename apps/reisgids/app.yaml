@@ -1,0 +1,97 @@
+# Reisgids: app van openBolle zelf, en het voorbeeld van een app die een gratis dienst op internet gebruikt
+# (netwerk:uitgaand, alleen naar de host hieronder; de uitgang van het platform laat niets anders door).
+manifest: 1
+id: reisgids
+naam: Reisgids
+versie: 1.1.0
+auteur:
+  naam: openBolle
+  email: plugins@openbolle.nl
+  github: openbolle
+  url: https://openbolle.nl
+licentie: MIT
+beschrijving:
+  kort: Wat is er hier te zien?
+  lang: >
+    Bezienswaardigheden, gebouwen en plaatsen langs de weg, met een kort verhaal erbij. Vraag wat er in de buurt is,
+    of laat Bolle iets vertellen over een kerk, kasteel of dorp waar je langsrijdt. Bron: Wikipedia (gratis, zonder account).
+categorie: onderweg
+pictogram: info
+logo: logo.png
+voorbeelden:
+  - Wat is er hier te zien?
+  - Vertel iets over deze plaats.
+  - Wat is dat voor kasteel?
+  - Vertel iets over de Dom van Utrecht.
+
+vereist:
+  bolleos: ">=0.3.2"
+  platform: ">=1.0 <2"
+  blokken: 1
+
+runtime:
+  taal: python
+  geheugen_mb: 48
+  cpu: 0.1
+  tijdslimiet_ms: 4000
+
+rechten:
+  - spraak:tools
+  - blokken:tonen
+  - locatie:afgerond      # 2 decimalen (ca. 1 km), alleen tijdens de vraag
+  - netwerk:uitgaand
+
+netwerk:
+  uitgaand:
+    - nl.wikipedia.org:443
+
+tools:
+  - naam: in_de_buurt
+    beschrijving: >
+      Bezienswaardigheden, gebouwen, plaatsen en andere bekende plekken bij de huidige plek (Wikipedia), de
+      belangrijkste eerst, met afstand en een korte omschrijving. Gebruik dit bij "wat is er hier te zien",
+      "is er iets bijzonders in de buurt", "wat is dat voor gebouw", "waar zijn we", "wat is dit voor dorp".
+    parameters:
+      type: object
+      properties:
+        km: { type: number, description: "Zoekstraal in km, standaard 5, hooguit 10" }
+    rijden: true
+    max_tekens: 500
+  - naam: vertel_over
+    beschrijving: >
+      Een kort verhaal over een plek, gebouw, plaats of onderwerp (de samenvatting van Wikipedia). Gebruik dit bij
+      "vertel iets over ...", "wat weet je van ...", "hoe oud is ...". Zonder onderwerp: over de belangrijkste plek
+      in de buurt. Noem de naam zoals de gebruiker hem zei; bij een plek in de buurt liefst de naam uit in_de_buurt.
+    parameters:
+      type: object
+      properties:
+        onderwerp: { type: string, description: "Naam van de plek of het onderwerp, bijvoorbeeld 'Dom van Utrecht'. Leeg = de belangrijkste plek in de buurt." }
+    rijden: true
+    max_tekens: 700
+
+blokken:
+  - id: buurt
+    soort: tegel
+    titel: In de buurt
+    pictogram: info
+    verversen_s: 600
+    rijden: volledig
+    hoofdscherm: false
+
+privacy:
+  doel: Vertellen wat er te zien is bij je plek.
+  gegevens:
+    - Huidige plek, afgerond op ca. 1 km, alleen tijdens de vraag; naar Wikipedia om plekken in de buurt te zoeken (niet bewaard, niet gelogd)
+  bewaartermijn: Er wordt niets bewaard.
+  derden:
+    - naam: Wikimedia Foundation (Wikipedia)
+      land: US
+      waarom: plekken in de buurt zoeken (plek afgerond op ca. 1 km) en samenvattingen ophalen
+      privacyverklaring: https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
+
+presentatie:
+  afbeeldingen:
+    - bestand: afbeeldingen/scherm.png
+      uitleg: "Wat is er hier te zien? Bezienswaardigheden in de buurt, dichtstbij eerst."
+    - bestand: afbeeldingen/toestemming.png
+      uitleg: "Reisgids vraagt je plek, afgerond op ongeveer een kilometer."

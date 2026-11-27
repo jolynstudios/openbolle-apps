@@ -1,0 +1,172 @@
+{
+ "access": {
+  "accessStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "doorLockStatus": "locked",
+    "overallStatus": "safe",
+    "doors": [
+     {
+      "name": "bonnet",
+      "status": [
+       "closed"
+      ]
+     },
+     {
+      "name": "frontLeft",
+      "status": [
+       "locked",
+       "closed"
+      ]
+     },
+     {
+      "name": "frontRight",
+      "status": [
+       "locked",
+       "closed"
+      ]
+     },
+     {
+      "name": "rearLeft",
+      "status": [
+       "locked",
+       "closed"
+      ]
+     },
+     {
+      "name": "rearRight",
+      "status": [
+       "locked",
+       "closed"
+      ]
+     },
+     {
+      "name": "trunk",
+      "status": [
+       "locked",
+       "closed"
+      ]
+     }
+    ],
+    "windows": [
+     {
+      "name": "frontLeft",
+      "status": [
+       "closed"
+      ]
+     },
+     {
+      "name": "frontRight",
+      "status": [
+       "closed"
+      ]
+     },
+     {
+      "name": "rearLeft",
+      "status": [
+       "closed"
+      ]
+     },
+     {
+      "name": "rearRight",
+      "status": [
+       "closed"
+      ]
+     },
+     {
+      "name": "roofCover",
+      "status": [
+       "unsupported"
+      ]
+     },
+     {
+      "name": "sunRoof",
+      "status": [
+       "unsupported"
+      ]
+     }
+    ]
+   }
+  }
+ },
+ "charging": {
+  "batteryStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "cruisingRangeElectric_km": 300,
+    "currentSOC_pct": 69
+   }
+  },
+  "chargingSettings": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "targetSOC_pct": 80
+   }
+  },
+  "chargingStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "chargeMode": "manual",
+    "chargePower_kW": 11,
+    "chargeRate_kmph": 50,
+    "chargeType": "ac",
+    "chargingState": "charging",
+    "remainingChargingTimeToComplete_min": 95
+   }
+  },
+  "plugStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "externalPower": "active",
+    "plugConnectionState": "connected",
+    "plugLockState": "locked"
+   }
+  }
+ },
+ "climatisation": {
+  "climatisationStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "climatisationState": "off",
+    "remainingClimatisationTime_min": 0
+   }
+  }
+ },
+ "fuelStatus": {
+  "rangeStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "carType": "electric",
+    "primaryEngine": {
+     "currentSOC_pct": 69,
+     "remainingRange_km": 300,
+     "type": "electric"
+    },
+    "totalRange_km": 300
+   }
+  }
+ },
+ "measurements": {
+  "fuelLevelStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "carType": "electric",
+    "currentSOC_pct": 69,
+    "primaryEngineType": "electric"
+   }
+  },
+  "odometerStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "odometer": 43740
+   }
+  },
+  "rangeStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "electricRange": 300,
+    "totalRange_km": 300
+   }
+  }
+ }
+}

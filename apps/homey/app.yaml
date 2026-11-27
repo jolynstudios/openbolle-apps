@@ -1,0 +1,146 @@
+# Homey: de referentie-app voor OAuth. De broker doet het inloggen (QR-code op Bolle, inloggen op je telefoon) en
+# geeft de app per aanroep alleen een kortlevend token. Internet alleen naar Athom en je eigen Homey Pro.
+manifest: 1
+id: homey
+naam: Homey
+versie: 1.2.0
+auteur:
+  naam: openBolle
+  email: plugins@openbolle.nl
+  github: openbolle
+  url: https://openbolle.nl
+licentie: MIT
+beschrijving:
+  kort: Je huis bedienen vanuit de auto
+  lang: >
+    Bedien je Homey Pro met je stem: lampen, stekkers en de thermostaat, flows starten en sferen kiezen.
+    Een slot, het alarm of de garagedeur alleen na bevestiging en nooit tijdens het rijden. Gaat thuis een rookmelder,
+    koolmonoxide- of watermelder af, dan meldt Bolle het. Op het scherm van Bolle (als je stilstaat): je favoriete apparaten aan of uit, je favoriete
+    flows of je sferen starten en een open garagedeur dicht doen.
+    Koppelen: installeer de app, kies op Bolle Menu > Apps > Homey > Koppelen en scan de QR-code met je telefoon.
+categorie: slimme-woning
+pictogram: huis
+logo: logo.png
+voorbeelden:
+  - Doe de lampen in de woonkamer aan
+  - Zet de verwarming op 20 graden
+  - Start de flow Bijna thuis
+  - Is de voordeur op slot?
+
+vereist:
+  bolleos: ">=0.3.5"
+  platform: ">=1.0 <2"
+  blokken: 1
+
+runtime:
+  taal: python
+  geheugen_mb: 64
+  cpu: 0.15
+  tijdslimiet_ms: 6000
+
+rechten:
+  - spraak:tools
+  - blokken:tonen
+  - vragen:stellen          # op het scherm van Bolle: schakelaars, je flows, de garagedeur dicht (nooit tijdens het rijden)
+  - meldingen:sturen        # uit zichzelf: een rookmelder, brand-, koolmonoxide-, hitte- of watermelder gaat af
+  - netwerk:uitgaand
+
+netwerk:
+  uitgaand:
+    - api.athom.com:443
+    - "*.homeypro.net:443"
+    - "*.connect.athom.com:443"
+
+oauth:
+  aanbieder: homey
+  autorisatie_url: https://api.athom.com/oauth2/authorise
+  token_url: https://api.athom.com/oauth2/token
+  scopes: []                  # staan vast op de client bij Athom (zone, device, flow, mood)
+  pkce: false
+  client_auth: client_secret_basic
+  extra_autorisatie_parameters:
+    authorization_type: code
+
+tools:
+  - naam: apparaten
+    beschrijving: >
+      Geeft de apparaten van de Homey met hun stand (aan/uit, dimniveau, temperatuur, slot, alarm), per kamer.
+      Gebruik dit bij vragen als "staat de verwarming aan", "welke lampen zijn aan", "is de voordeur op slot".
+    parameters:
+      type: object
+      properties:
+        kamer: { type: string, description: "Alleen deze kamer (zone), bijvoorbeeld woonkamer. Leeg = alles." }
+    rijden: true
+    max_tekens: 900
+  - naam: bedien
+    beschrijving: >
+      Zet lampen, stekkers of de thermostaat. apparaat is een apparaatnaam of een kamer ("woonkamer" = alle lampen daar).
+      Niet voor sloten, alarm of garagedeur: gebruik daarvoor beveiliging.
+    parameters:
+      type: object
+      properties:
+        apparaat: { type: string, description: "Naam van het apparaat of de kamer" }
+        actie: { type: string, enum: [aan, uit, dimmen, temperatuur] }
+        waarde: { type: number, description: "Bij dimmen 0-100 (procent), bij temperatuur graden Celsius" }
+      required: [apparaat, actie]
+    rijden: true
+    max_tekens: 300
+  - naam: beveiliging
+    beschrijving: >
+      Slot, alarm of garagedeur bedienen. Vraag altijd eerst bevestiging. Kan niet tijdens het rijden.
+    parameters:
+      type: object
+      properties:
+        apparaat: { type: string, description: "Naam van het slot, alarm of de garagedeur" }
+        actie: { type: string, enum: [op_slot, van_slot, alarm_aan, alarm_uit, open, dicht] }
+      required: [apparaat, actie]
+    bevestigen: true
+    rijden: false
+    max_tekens: 300
+  - naam: flow_starten
+    beschrijving: >
+      Start een flow van de Homey op naam, bijvoorbeeld "Bijna thuis". Zonder naam: geeft de flows die je kunt starten.
+    parameters:
+      type: object
+      properties:
+        naam: { type: string, description: "Naam van de flow" }
+    rijden: true
+    max_tekens: 500
+  - naam: sfeer
+    beschrijving: >
+      Zet een sfeer (mood) van de Homey aan, bijvoorbeeld "Avond". Zonder naam: geeft de sferen.
+    parameters:
+      type: object
+      properties:
+        naam: { type: string, description: "Naam van de sfeer" }
+    rijden: true
+    max_tekens: 400
+
+blokken:
+  - id: huis
+    soort: tegel
+    titel: Huis
+    pictogram: huis
+    verversen_s: 300
+    rijden: volledig
+    hoofdscherm: true
+
+privacy:
+  doel: Je Homey Pro bedienen en de stand van je apparaten tonen.
+  gegevens:
+    - Toegang tot je Homey (namen, kamers, stand van apparaten, flows, sferen, je favorieten), via inloggen bij Athom
+    - Het token staat versleuteld bij openBolle en wordt gewist als je de app verwijdert
+  bewaartermijn: Tot je de app verwijdert of de toegang intrekt in je Homey-account.
+  derden:
+    - naam: Athom B.V. (Homey)
+      land: NL
+      waarom: inloggen en je Homey Pro bereiken
+      privacyverklaring: https://homey.app/nl-nl/legal/privacy-policy/
+
+presentatie:
+  documentatie: handleiding.md
+  afbeeldingen:
+    - bestand: afbeeldingen/scherm.png
+      uitleg: "Koppel je Homey Pro met de QR-code; daarna bedien je je huis met je stem."
+    - bestand: afbeeldingen/toestemming.png
+      uitleg: "Homey vraagt alleen wat hij nodig heeft: de assistent, tegels en een verbinding met Homey."

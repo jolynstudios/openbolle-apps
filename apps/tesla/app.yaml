@@ -1,0 +1,114 @@
+# Tesla: accu, bereik, laden, slot en temperatuur van je eigen Tesla, via de officiële Fleet API van Tesla.
+# Eigen app: elke gebruiker maakt zelf een app aan op developer.tesla.com (eigen kosten, binnen het gratis tegoed van
+# Tesla) en vult bij het koppelen zijn eigen Client ID en Secret in. openBolle betaalt niets en ziet geen wachtwoord.
+manifest: 1
+id: tesla
+naam: Tesla
+versie: 1.2.0
+auteur:
+  naam: openBolle
+  email: plugins@openbolle.nl
+  github: openbolle
+  url: https://openbolle.nl
+licentie: MIT
+beschrijving:
+  kort: Accu, bereik en laden van je Tesla
+  lang: >
+    Zie hoe vol je Tesla is, hoe ver je nog komt, of hij laadt en of hij op slot staat. Vraag het aan Bolle, open de
+    app op Bolle (met de knoppen Ververs en Wekken) of zie de accu op je beginscherm. Bolle meldt het als je Tesla klaar is met laden, of niet op slot
+    staat terwijl er niemand bij is. Je gebruikt je eigen app bij Tesla (gratis tegoed van Tesla, zie de uitleg);
+    openBolle betaalt niets en ziet je wachtwoord nooit. Een slapende Tesla wordt alleen wakker gemaakt als je daarom
+    vraagt.
+categorie: auto
+pictogram: auto
+logo: logo.png
+voorbeelden:
+  - Hoe vol is mijn Tesla?
+  - Laadt de auto nog?
+  - Staat de Tesla op slot?
+
+vereist:
+  bolleos: ">=0.3.5"         # schermen en knoppen vanaf 1.2.0; een oudere Bolle toont de accu en de regels
+  platform: ">=1.0 <2"
+  blokken: 1
+
+runtime:
+  taal: node
+  geheugen_mb: 64
+  cpu: 0.1
+  tijdslimiet_ms: 8000
+  opslag_kb: 4
+
+rechten:
+  - spraak:tools
+  - blokken:tonen
+  - meldingen:sturen        # uit zichzelf: klaar met laden, of niet op slot terwijl er niemand bij is
+  - netwerk:uitgaand
+  - opslag:klein
+  - vragen:stellen          # de knoppen op Bolle: Ververs en Wekken
+
+netwerk:
+  uitgaand:
+    - fleet-api.prd.eu.vn.cloud.tesla.com:443
+
+oauth:
+  aanbieder: tesla
+  autorisatie_url: https://auth.tesla.com/oauth2/v3/authorize
+  token_url: https://fleet-auth.prd.vn.cloud.tesla.com/oauth2/v3/token
+  scopes: [openid, offline_access, vehicle_device_data]
+  pkce: false
+  client_auth: client_secret_post
+  extra_token_parameters:
+    audience: https://fleet-api.prd.eu.vn.cloud.tesla.com
+  eigen_app:
+    dienst: Tesla
+    aanmaken_url: https://developer.tesla.com
+    uitleg_url: https://openbolle.nl/docs/plugins/tesla
+  app_registratie:                 # Tesla eist dat elke app het domein aanmeldt (met de publieke sleutel op dat domein)
+    url: https://fleet-api.prd.eu.vn.cloud.tesla.com/api/1/partner_accounts
+    scopes: [openid, vehicle_device_data]
+    body:
+      domain: "{domein}"
+
+tools:
+  - naam: status
+    beschrijving: >
+      Hoe het met de Tesla van de gebruiker staat: accu (procent), bereik in km, laden (vermogen, wanneer vol),
+      slot en temperatuur binnen en buiten. Slaapt de auto, dan de laatst bekende stand; alleen met wakker_maken true
+      wordt hij gewekt (dat kost de gebruiker een paar cent van zijn eigen Tesla-tegoed, dus vraag het eerst).
+    parameters:
+      type: object
+      properties:
+        wakker_maken: { type: boolean, description: "Alleen true als de gebruiker zegt dat de auto gewekt mag worden" }
+    rijden: true
+    max_tekens: 400
+
+blokken:
+  - id: accu
+    soort: tegel
+    titel: Tesla
+    pictogram: auto
+    verversen_s: 900
+    rijden: eenregel
+    hoofdscherm: true
+
+privacy:
+  doel: De stand van je eigen Tesla tonen en op je vragen antwoorden (accu, bereik, laden, slot, temperatuur).
+  gegevens:
+    - Toegang tot je Tesla (token), versleuteld bij de broker van openBolle; je eigen Client ID en Secret, ook versleuteld
+    - De laatst bekende stand van je auto (accu, bereik, laden, slot, of er iemand in de auto is, temperatuur, kilometerstand) en een teller van de aanvragen deze maand
+    - Niet je locatie
+  bewaartermijn: Tot je de app verwijdert; dan wordt alles gewist.
+  derden:
+    - naam: Tesla
+      land: US
+      waarom: de gegevens van je auto ophalen via de Fleet API (met je eigen app)
+      privacyverklaring: https://www.tesla.com/nl_nl/legal/privacy
+
+presentatie:
+  documentatie: handleiding.md
+  afbeeldingen:
+    - bestand: afbeeldingen/scherm.png
+      uitleg: "Koppel je Tesla met de QR-code en zie accu, bereik en laden op Bolle."
+    - bestand: afbeeldingen/toestemming.png
+      uitleg: "Tesla vraagt de assistent, tegels en een verbinding met je auto."

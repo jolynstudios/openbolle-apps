@@ -1,0 +1,32 @@
+{
+  "name": "openbolle-apps",
+  "version": "1.0.0",
+  "description": "openBolle-apps maken, lokaal draaien, controleren, ondertekenen en in je eigen winkel zetten: npx github:jolynstudios/openbolle-apps nieuw|dev|controleer|sleutel|onderteken|winkel|installeer",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "openbolle": "bin/openbolle.mjs"
+  },
+  "files": [
+    "bin/",
+    "cli/",
+    "schema/app.schema.json",
+    "schema/bolleos.json",
+    "tools/voorbeelddata.json",
+    "sjabloon/mijnapp/",
+    "sjabloon/mijnapp-ts/",
+    "sjabloon/mijnaccessoire/"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jolynstudios/openbolle-apps.git"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "yaml": "^2.9.1"
+  }
+}

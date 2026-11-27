@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openbolle.nl/schema/winkel.schema.json",
+  "title": "openBolle-winkel (winkel.json)",
+  "description": "Een winkel is een plek op internet met een winkel.json. Bolle en de website lezen hem. Paden zijn relatief aan winkel.json. Maak hem met tools/maak_winkel.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "winkel",
+    "naam",
+    "plugins"
+  ],
+  "properties": {
+    "winkel": {
+      "const": 1
+    },
+    "naam": {
+      "type": "string",
+      "maxLength": 60
+    },
+    "beschrijving": {
+      "type": "string",
+      "maxLength": 400
+    },
+    "website": {
+      "type": "string",
+      "pattern": "^https://"
+    },
+    "sleutel": {
+      "description": "Publieke sleutel (PEM, EC P-256) waarmee accessoireprofielen van deze winkel ondertekend zijn. Bolle vraagt de gebruiker deze sleutel te vertrouwen bij het toevoegen van de winkel.",
+      "type": "string"
+    },
+    "plugins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "naam",
+          "versie",
+          "soort",
+          "kort"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{1,30}$"
+          },
+          "naam": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "versie": {
+            "type": "string"
+          },
+          "soort": {
+            "enum": [
+              "server",
+              "accessoire"
+            ],
+            "description": "server: draait op een platform (zoals openBolle). accessoire: een ondertekend profiel dat op Bolle zelf draait."
+          },
+          "categorie": {
+            "type": "string"
+          },
+          "kort": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "lang": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "auteur": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "logo": {
+            "type": "string"
+          },
+          "afbeeldingen": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "bestand",
+                "uitleg"
+              ],
+              "properties": {
+                "bestand": {
+                  "type": "string"
+                },
+                "uitleg": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "documentatie": {
+            "type": "string"
+          },
+          "voorbeelden": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "website": {
+            "type": "string"
+          },
+          "bron": {
+            "type": "string",
+            "description": "Waar de broncode staat (bijvoorbeeld een GitHub-map)."
+          },
+          "profiel": {
+            "type": "string",
+            "description": "accessoire: het ondertekende profiel"
+          },
+          "handtekening": {
+            "type": "string",
+            "description": "accessoire: handtekening (DER) over de bytes van het profiel"
+          }
+        }
+      }
+    }
+  }
+}

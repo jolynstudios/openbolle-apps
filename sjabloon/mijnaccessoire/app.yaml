@@ -1,0 +1,19 @@
+# Accessoire-app: een ondertekend profiel dat op Bolle zelf draait (geen server, geen code).
+manifest: 1
+id: mijn-accessoire
+naam: Mijn accessoire
+versie: 1.0.0                 # groot.klein.reparatie; gelijk aan de versie in profiel.json. Bolle gaat nooit terug naar een lagere.
+auteur:
+  naam: Jouw naam
+  github: jouw-naam
+soort: accessoire
+categorie: onderweg
+beschrijving:
+  kort: De meldingen van een app op je telefoon op Bolle
+  lang: >
+    Bolle laat de pushmeldingen van een app op je telefoon zien als zijn eigen meldingen, groot en in kleur.
+    Werkt via Bluetooth met je iPhone, ook zonder wifi.
+profiel: dist/profiel.json                # maakt `onderteken` uit profiel.json
+handtekening: dist/profiel.json.sig
+presentatie:
+  documentatie: docs/handleiding.md

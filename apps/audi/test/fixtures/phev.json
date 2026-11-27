@@ -1,0 +1,77 @@
+{
+ "access": {
+  "accessStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "doorLockStatus": "locked",
+    "doors": [],
+    "windows": []
+   }
+  }
+ },
+ "charging": {
+  "batteryStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "cruisingRangeElectric_km": 48,
+    "currentSOC_pct": 92
+   }
+  },
+  "chargingSettings": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "targetSOC_pct": 100
+   }
+  },
+  "chargingStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "chargingState": "readyForCharging",
+    "chargePower_kW": 0,
+    "remainingChargingTimeToComplete_min": 0
+   }
+  },
+  "plugStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "plugConnectionState": "disconnected",
+    "externalPower": "unavailable"
+   }
+  }
+ },
+ "fuelStatus": {
+  "rangeStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "carType": "hybrid",
+    "primaryEngine": {
+     "currentFuelLevel_pct": 55,
+     "remainingRange_km": 520,
+     "type": "gasoline"
+    },
+    "secondaryEngine": {
+     "currentSOC_pct": 92,
+     "remainingRange_km": 48,
+     "type": "electric"
+    },
+    "totalRange_km": 568
+   }
+  }
+ },
+ "measurements": {
+  "fuelLevelStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "carType": "hybrid",
+    "currentFuelLevel_pct": 55,
+    "currentSOC_pct": 92
+   }
+  },
+  "odometerStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "odometer": 20311
+   }
+  }
+ }
+}

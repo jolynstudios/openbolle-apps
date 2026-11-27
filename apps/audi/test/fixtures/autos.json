@@ -1,0 +1,16 @@
+{
+ "data": {
+  "userVehicles": [
+   {
+    "vin": "WAUZZZGE0PB000001",
+    "nickname": "",
+    "vehicle": {
+     "media": {
+      "shortName": "Q8 e-tron",
+      "longName": "Audi Q8 Sportback e-tron"
+     }
+    }
+   }
+  ]
+ }
+}

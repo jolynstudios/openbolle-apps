@@ -1,0 +1,1010 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openbolle.nl/schema/plugin/1.json",
+  "title": "openBolle app.yaml (manifest versie 1)",
+  "description": "Beschrijft een openBolle-app: wie hem maakt, wat hij mag, welke spraakfuncties en bouwstenen hij levert en welke instellingen hij nodig heeft. Zie docs/PLATFORM.md, hoofdstuk 7.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest",
+    "id",
+    "naam",
+    "versie",
+    "auteur",
+    "licentie",
+    "beschrijving",
+    "categorie",
+    "pictogram",
+    "vereist",
+    "runtime",
+    "rechten",
+    "privacy"
+  ],
+  "properties": {
+    "manifest": {
+      "description": "Versie van dit manifestformaat.",
+      "const": 1
+    },
+    "id": {
+      "description": "Vaste, unieke naam van de app. Verandert nooit.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,31}(?![\\s\\S])"
+    },
+    "naam": {
+      "description": "Naam op het scherm en in de winkel.",
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 16
+    },
+    "versie": {
+      "description": "Semver van de app (MAJOR.MINOR.PATCH, eventueel -voorversie).",
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z.-]+)?(?![\\s\\S])"
+    },
+    "auteur": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "naam",
+        "email",
+        "github"
+      ],
+      "properties": {
+        "naam": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "github": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9-]{1,39}(?![\\s\\S])"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://[^\\s\\x00-\\x1f\\x7f]+(?![\\s\\S])"
+        }
+      }
+    },
+    "licentie": {
+      "description": "SPDX-naam van de licentie.",
+      "type": "string",
+      "examples": [
+        "MIT",
+        "Apache-2.0",
+        "GPL-3.0-only"
+      ]
+    },
+    "beschrijving": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kort",
+        "lang"
+      ],
+      "properties": {
+        "kort": {
+          "description": "Eén regel op het apparaat (winkel, Nieuw).",
+          "type": "string",
+          "maxLength": 40
+        },
+        "lang": {
+          "description": "Tekst in het portaal.",
+          "type": "string",
+          "maxLength": 2000
+        }
+      }
+    },
+    "categorie": {
+      "type": "string",
+      "enum": [
+        "slimme-woning",
+        "onderweg",
+        "auto",
+        "media",
+        "informatie",
+        "spel",
+        "overig"
+      ]
+    },
+    "pictogram": {
+      "$ref": "#/$defs/pictogram"
+    },
+    "logo": {
+      "description": "Eigen logo: een PNG in de map van de app (vierkant, minstens 256 × 256 px, hooguit 100 KB). Bolle en de winkel tonen het rond bijgesneden; zonder logo het pictogram.",
+      "type": "string",
+      "pattern": "^[a-z0-9_-]{1,40}\\.png(?![\\s\\S])"
+    },
+    "vereist": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bolleos",
+        "platform",
+        "blokken"
+      ],
+      "properties": {
+        "bolleos": {
+          "description": "Semver-bereik van BolleOS, bv. \">=1.2.0\".",
+          "type": "string"
+        },
+        "platform": {
+          "description": "Versie van het protocol van het platform (runtime), bv. \">=1.0 <2\".",
+          "type": "string"
+        },
+        "blokken": {
+          "description": "Versie van de bouwstenencatalogus die het apparaat moet kennen.",
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taal"
+      ],
+      "properties": {
+        "taal": {
+          "type": "string",
+          "enum": [
+            "python",
+            "node",
+            "go",
+            "anders"
+          ]
+        },
+        "geheugen_mb": {
+          "description": "Maximaal geheugen van de container.",
+          "type": "integer",
+          "minimum": 32,
+          "maximum": 256,
+          "default": 128
+        },
+        "cpu": {
+          "description": "Maximaal aantal cpu's (fractie).",
+          "type": "number",
+          "minimum": 0.05,
+          "maximum": 0.5,
+          "default": 0.25
+        },
+        "tijdslimiet_ms": {
+          "description": "Maximale duur van één aanroep (tool, blok, actie).",
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 8000,
+          "default": 4000
+        },
+        "opslag_kb": {
+          "description": "Ruimte in de sleutel-waardeopslag per installatie.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256,
+          "default": 64
+        }
+      }
+    },
+    "rechten": {
+      "description": "Scopes die de app vraagt. Alles wat hier niet staat, mag niet.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/scope"
+      }
+    },
+    "netwerk": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "uitgaand": {
+          "description": "Toegestane bestemmingen (host:poort). Een * mag alleen als eerste label. Nooit IP-adressen of interne namen.",
+          "type": "array",
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(\\*\\.)?([a-z0-9-]+\\.)+[a-z]{2,}:(443|8443)(?![\\s\\S])"
+          }
+        }
+      }
+    },
+    "oauth": {
+      "description": "OAuth 2.0 naar een externe dienst. De broker doet de uitwisseling en het verversen; de app krijgt per aanroep alleen een kortlevend toegangstoken.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "aanbieder",
+        "autorisatie_url",
+        "token_url",
+        "scopes"
+      ],
+      "properties": {
+        "aanbieder": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{1,31}(?![\\s\\S])"
+        },
+        "autorisatie_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://[^\\s\\x00-\\x1f\\x7f]+(?![\\s\\S])"
+        },
+        "token_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://[^\\s\\x00-\\x1f\\x7f]+(?![\\s\\S])"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "pkce": {
+          "type": "boolean",
+          "default": true
+        },
+        "client_auth": {
+          "type": "string",
+          "enum": [
+            "client_secret_basic",
+            "client_secret_post",
+            "none"
+          ],
+          "default": "client_secret_basic"
+        },
+        "extra_autorisatie_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "code_parameter": {
+          "description": "Naam van de code-parameter bij het omruilen (standaard 'code'; Athom gebruikt 'authorization_code').",
+          "type": "string",
+          "pattern": "^[a-z_]{2,32}(?![\\s\\S])",
+          "default": "code"
+        },
+        "extra_token_parameters": {
+          "description": "Extra velden bij het omruilen van de code (en bij app_registratie), bijvoorbeeld audience.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "eigen_app": {
+          "description": "De gebruiker brengt zijn eigen app bij de dienst mee (eigen client-id en -secret, eigen kosten). Bij het koppelen vult hij die in op zijn telefoon; de broker bewaart ze versleuteld per installatie.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "dienst",
+            "aanmaken_url"
+          ],
+          "properties": {
+            "dienst": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "aanmaken_url": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://[^\\s\\x00-\\x1f\\x7f]+(?![\\s\\S])"
+            },
+            "uitleg_url": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://[^\\s\\x00-\\x1f\\x7f]+(?![\\s\\S])"
+            }
+          }
+        },
+        "app_registratie": {
+          "description": "Eenmalig na het invullen van een eigen app: de broker haalt een app-token (client_credentials) en POST de body (JSON) naar url. {domein} wordt het domein van openBolle.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "url"
+          ],
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://[^\\s\\x00-\\x1f\\x7f]+(?![\\s\\S])"
+            },
+            "scopes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            "body": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "instellingen": {
+      "description": "Velden die de gebruiker in het portaal invult. Geheimen gaan naar de kluis.",
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "$ref": "#/$defs/instelling"
+      }
+    },
+    "tools": {
+      "description": "Spraakfuncties (MCP-tools) die de assistent mag aanroepen.",
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "$ref": "#/$defs/tool"
+      }
+    },
+    "blokken": {
+      "description": "Bouwstenen die het apparaat zelf tekent.",
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/blok"
+      }
+    },
+    "acties": {
+      "description": "Handelingen die vanuit een blok (tik) kunnen worden aangeroepen.",
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "$ref": "#/$defs/actie"
+      }
+    },
+    "taken": {
+      "description": "Terugkerend werk, bv. elke 5 minuten de status ophalen. De broker start de taak alleen voor installaties waarvan het apparaat recent online was.",
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "elke_s"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/naam"
+          },
+          "elke_s": {
+            "type": "integer",
+            "minimum": 60,
+            "maximum": 86400
+          },
+          "alleen_als_apparaat_online": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    },
+    "privacy": {
+      "description": "Gaat het verwerkingsregister in en staat in de winkel.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "doel",
+        "gegevens",
+        "bewaartermijn",
+        "derden"
+      ],
+      "properties": {
+        "doel": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "gegevens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "bewaartermijn": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "derden": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "naam",
+              "land",
+              "waarom"
+            ],
+            "properties": {
+              "naam": {
+                "type": "string"
+              },
+              "land": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}(?![\\s\\S])"
+              },
+              "waarom": {
+                "type": "string"
+              },
+              "privacyverklaring": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        },
+        "wissen_bij_ontkoppelen": {
+          "type": "boolean",
+          "default": false
+        },
+        "alleen_stilstaand": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "voorbeelden": {
+      "type": "array",
+      "maxItems": 5,
+      "description": "Zinnen die je aan Bolle kunt vragen. Geen vaste commando's: het taalmodel kiest de tool op de beschrijving; deze zinnen staan in de winkel, op het toestemmingsscherm en bij de app.",
+      "items": {
+        "type": "string",
+        "minLength": 4,
+        "maxLength": 60
+      }
+    },
+    "presentatie": {
+      "description": "Voor de winkel op de website en in het portaal: afbeeldingen, een handleiding en een website. Bolle zelf toont alleen naam, logo en beschrijving.kort.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "afbeeldingen": {
+          "description": "Schermen van Bolle met je app (PNG, 466 × 466 of kleiner, hooguit 200 KB per stuk), in de map van de app.",
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "bestand",
+              "uitleg"
+            ],
+            "properties": {
+              "bestand": {
+                "type": "string",
+                "pattern": "^[a-z0-9_/.-]{1,80}\\.png(?![\\s\\S])"
+              },
+              "uitleg": {
+                "type": "string",
+                "maxLength": 120
+              }
+            }
+          }
+        },
+        "documentatie": {
+          "description": "Handleiding in Markdown, in de map van de app. De winkel op de website toont hem als pagina.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_/.-]{1,80}\\.md(?![\\s\\S])"
+        },
+        "website": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://[^\\s\\x00-\\x1f\\x7f]+(?![\\s\\S])"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "rechten": {
+            "contains": {
+              "const": "netwerk:uitgaand"
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "netwerk"
+        ]
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "oauth"
+        ]
+      },
+      "then": {
+        "properties": {
+          "rechten": {
+            "contains": {
+              "const": "netwerk:uitgaand"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "tools": {
+            "minItems": 1
+          }
+        },
+        "required": [
+          "tools"
+        ]
+      },
+      "then": {
+        "properties": {
+          "rechten": {
+            "contains": {
+              "const": "spraak:tools"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "taken"
+        ],
+        "properties": {
+          "taken": {
+            "minItems": 1
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "rechten": {
+            "contains": {
+              "const": "achtergrond:taken"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "rechten": {
+            "contains": {
+              "const": "personen:ontmoeten"
+            }
+          }
+        },
+        "required": [
+          "rechten"
+        ]
+      },
+      "then": {
+        "properties": {
+          "privacy": {
+            "required": [
+              "alleen_stilstaand",
+              "wissen_bij_ontkoppelen"
+            ],
+            "properties": {
+              "alleen_stilstaand": {
+                "const": true
+              },
+              "wissen_bij_ontkoppelen": {
+                "const": true
+              }
+            }
+          },
+          "rechten": {
+            "allOf": [
+              {
+                "contains": {
+                  "const": "rit:status"
+                }
+              },
+              {
+                "contains": {
+                  "const": "locatie:precies"
+                }
+              }
+            ]
+          },
+          "blokken": {
+            "items": {
+              "required": [
+                "rijden"
+              ],
+              "properties": {
+                "rijden": {
+                  "const": "verborgen"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "blokken"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "naam": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,31}(?![\\s\\S])"
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "spraak:tools",
+        "blokken:tonen",
+        "meldingen:sturen",
+        "opslag:klein",
+        "netwerk:uitgaand",
+        "achtergrond:taken",
+        "locatie:afgerond",
+        "locatie:precies",
+        "rit:status",
+        "data:laadpalen",
+        "data:verkeer",
+        "vragen:stellen",
+        "personen:ontmoeten"
+      ]
+    },
+    "pictogram": {
+      "description": "Vaste set iconen op het apparaat (getekend, geen bitmaps uit de app).",
+      "type": "string",
+      "enum": [
+        "huis",
+        "lamp",
+        "stekker",
+        "thermometer",
+        "slot",
+        "deur",
+        "garage",
+        "camera",
+        "alarm",
+        "laadpaal",
+        "bliksem",
+        "batterij",
+        "auto",
+        "route",
+        "pin",
+        "parkeren",
+        "brandstof",
+        "muziek",
+        "bericht",
+        "agenda",
+        "klok",
+        "ster",
+        "hart",
+        "info",
+        "vraag",
+        "vink",
+        "kruis",
+        "zon",
+        "wolk",
+        "regen",
+        "puzzel",
+        "lijst",
+        "instellingen",
+        "hand",
+        "persoon"
+      ]
+    },
+    "tekstveld": {
+      "description": "Tekst in een blok: letterlijk, of {{pad}} naar een waarde die de app teruggeeft.",
+      "type": "string",
+      "maxLength": 80
+    },
+    "instelling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sleutel",
+        "type",
+        "label"
+      ],
+      "properties": {
+        "sleutel": {
+          "$ref": "#/$defs/naam"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "tekst",
+            "getal",
+            "schakelaar",
+            "keuze",
+            "meerkeuze",
+            "geheim",
+            "oauth",
+            "foto"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "uitleg": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "verplicht": {
+          "type": "boolean",
+          "default": false
+        },
+        "standaard": {},
+        "opties": {
+          "description": "Vaste keuzes, of \"dynamisch\": het portaal vraagt ze aan de app (methode opties/<sleutel>).",
+          "oneOf": [
+            {
+              "const": "dynamisch"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "waarde",
+                  "label"
+                ],
+                "properties": {
+                  "waarde": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "patroon": {
+          "description": "Reguliere expressie voor tekst/geheim.",
+          "type": "string"
+        },
+        "zichtbaar": {
+          "description": "Alleen bij geheim: tijdens het typen leesbaar (bijv. kenteken, telefoonnummer). Wordt nog steeds versleuteld opgeslagen en nooit teruggetoond.",
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "keuze",
+                  "meerkeuze"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "opties"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "geheim",
+                  "oauth",
+                  "foto"
+                ]
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "standaard"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "naam",
+        "beschrijving",
+        "parameters"
+      ],
+      "properties": {
+        "naam": {
+          "$ref": "#/$defs/naam"
+        },
+        "beschrijving": {
+          "description": "Voor het taalmodel, in het Nederlands: wanneer gebruik je dit en wanneer niet.",
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 400
+        },
+        "parameters": {
+          "description": "JSON Schema (object) van de argumenten.",
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "object"
+            }
+          }
+        },
+        "bevestigen": {
+          "description": "true = de assistent vraagt eerst \"Zal ik ...?\" en voert pas uit na \"ja\". Verplicht voor handelingen met gevolgen in de echte wereld (slot, alarm, garagedeur).",
+          "type": "boolean",
+          "default": false
+        },
+        "rijden": {
+          "description": "Mag deze tool tijdens het rijden worden aangeroepen?",
+          "type": "boolean",
+          "default": true
+        },
+        "max_tekens": {
+          "description": "Het resultaat wordt hierop afgekapt voordat het naar het taalmodel gaat.",
+          "type": "integer",
+          "minimum": 50,
+          "maximum": 1500,
+          "default": 600
+        }
+      }
+    },
+    "actie": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/naam"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 16
+        },
+        "bevestigen": {
+          "type": "boolean",
+          "default": false
+        },
+        "rijden": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "blok": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "soort",
+        "titel"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/naam"
+        },
+        "soort": {
+          "type": "string",
+          "enum": [
+            "tegel",
+            "kaart",
+            "lijst",
+            "melding",
+            "menu"
+          ]
+        },
+        "titel": {
+          "type": "string",
+          "maxLength": 16
+        },
+        "pictogram": {
+          "$ref": "#/$defs/pictogram"
+        },
+        "verversen_s": {
+          "description": "Hoe vaak het apparaat de inhoud opnieuw vraagt (zolang het blok zichtbaar is).",
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 86400,
+          "default": 300
+        },
+        "rijden": {
+          "description": "verborgen = niet tijdens het rijden; eenregel = alleen titel + één regel; volledig = alleen voor tegel en melding.",
+          "type": "string",
+          "enum": [
+            "verborgen",
+            "eenregel",
+            "volledig"
+          ],
+          "default": "verborgen"
+        },
+        "hoofdscherm": {
+          "description": "Mag als vak in het keuzemenu (kiesring) worden gekozen. Alleen voor soort tegel.",
+          "type": "boolean",
+          "default": false
+        },
+        "achtergrond_s": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 120,
+          "description": "Opt-in ontmoetingsapp: korte aanwezigheidspoll terwijl actief (personen:ontmoeten)."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "soort": {
+                "enum": [
+                  "kaart",
+                  "lijst",
+                  "menu"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "rijden": {
+                "enum": [
+                  "verborgen",
+                  "eenregel"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "hoofdscherm": {
+                "const": true
+              }
+            },
+            "required": [
+              "hoofdscherm"
+            ]
+          },
+          "then": {
+            "properties": {
+              "soort": {
+                "const": "tegel"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

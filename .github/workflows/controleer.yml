@@ -1,0 +1,55 @@
+name: controleer
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  apps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install pyyaml==6.0.3 jsonschema==4.25.1
+      - name: schema en regels
+        run: python3 tools/controleer.py
+      - name: winkel.json is bijgewerkt en geldig
+        run: |
+          python3 tools/maak_winkel.py
+          git diff --exit-code winkel.json
+          python3 -c "import json,jsonschema; jsonschema.validate(json.load(open('winkel.json')), json.load(open('schema/winkel.schema.json')))"
+      - name: contract (bouwen, starten, tools/list)
+        run: python3 tools/controleer.py --contract
+      - name: sjablonen blijven geldig
+        run: python3 tools/controleer.py sjabloon/mijnapp sjabloon/mijnapp-ts
+      - name: kopie van openbolle.ts in het TypeScript-sjabloon is gelijk aan de bron
+        run: cmp sdk/typescript/src/openbolle.ts sjabloon/mijnapp-ts/src/openbolle.ts
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Node-controle (npx github:jolynstudios/openbolle-apps controleer)
+        run: |
+          npm ci --no-audit --no-fund
+          node bin/openbolle.mjs controleer
+          node bin/openbolle.mjs controleer sjabloon/mijnapp sjabloon/mijnapp-ts
+          node bin/openbolle.mjs winkel --controleer
+      - name: accessoire-app (nieuw, sleutel, onderteken, controleer, winkel)
+        run: |
+          B="$PWD/bin/openbolle.mjs"; T="$(mktemp -d)"; cd "$T"
+          node "$B" nieuw proef-app --soort accessoire && cd proef-app
+          node "$B" sleutel --sleutel "$T/geheim.pem"
+          ! node "$B" controleer                      # nog niet ondertekend: moet falen
+          node "$B" onderteken --sleutel "$T/geheim.pem"
+          node "$B" controleer
+          node "$B" winkel && node "$B" winkel --controleer
+      - name: tests van de apps (zonder netwerk)
+        run: |
+          for p in homey kilometers reisgids; do (cd apps/$p && python3 -m unittest discover -s test); done
+          for p in audi tesla; do (cd apps/$p && npm ci --no-audit --no-fund && npm test && npm run kopie); done
+      - name: TypeScript (sdk en sjabloon)
+        run: |
+          (cd sdk/typescript && npm ci && npx tsc --noEmit)
+          (cd sjabloon/mijnapp-ts && npm ci && npx tsc --noEmit)

@@ -1,0 +1,132 @@
+{
+ "access": {
+  "accessStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "doorLockStatus": "unlocked",
+    "overallStatus": "unsafe",
+    "doors": [
+     {
+      "name": "frontLeft",
+      "status": [
+       "unlocked",
+       "closed"
+      ]
+     },
+     {
+      "name": "frontRight",
+      "status": [
+       "unlocked",
+       "closed"
+      ]
+     },
+     {
+      "name": "rearLeft",
+      "status": [
+       "unlocked",
+       "closed"
+      ]
+     },
+     {
+      "name": "rearRight",
+      "status": [
+       "unlocked",
+       "closed"
+      ]
+     },
+     {
+      "name": "trunk",
+      "status": [
+       "unlocked",
+       "closed"
+      ]
+     }
+    ],
+    "windows": [
+     {
+      "name": "frontLeft",
+      "status": [
+       "open"
+      ]
+     },
+     {
+      "name": "frontRight",
+      "status": [
+       "closed"
+      ]
+     },
+     {
+      "name": "rearLeft",
+      "status": [
+       "closed"
+      ]
+     },
+     {
+      "name": "rearRight",
+      "status": [
+       "closed"
+      ]
+     },
+     {
+      "name": "sunRoof",
+      "status": [
+       "closed"
+      ]
+     }
+    ]
+   }
+  }
+ },
+ "fuelStatus": {
+  "rangeStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "carType": "gasoline",
+    "primaryEngine": {
+     "currentFuelLevel_pct": 63,
+     "remainingRange_km": 412,
+     "type": "gasoline"
+    },
+    "totalRange_km": 412
+   }
+  }
+ },
+ "measurements": {
+  "fuelLevelStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "carType": "gasoline",
+    "currentFuelLevel_pct": 63,
+    "primaryEngineType": "gasoline"
+   }
+  },
+  "odometerStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "odometer": 128455
+   }
+  },
+  "rangeStatus": {
+   "value": {
+    "carCapturedTimestamp": "2026-11-23T08:09:17Z",
+    "gasolineRange": 412,
+    "totalRange_km": 412
+   }
+  }
+ },
+ "charging": {
+  "batteryStatus": {
+   "error": {
+    "message": "unsupported",
+    "errorTimeStamp": "2026-11-23T08:09:17Z"
+   }
+  }
+ },
+ "climatisation": {
+  "climatisationStatus": {
+   "error": {
+    "message": "unsupported"
+   }
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+  "laadpalen": {
+    "ouderdom_s": 60,
+    "laadpalen": [
+      {
+        "afstand_km": 0.9,
+        "lat": 51.565,
+        "lon": 5.098,
+        "naam": "Voorbeeld snellader",
+        "plaats": "Tilburg",
+        "beheerder": "Voorbeeld BV",
+        "max_kw": 150,
+        "vrij": 2,
+        "totaal": 4,
+        "bijgewerkt": "2026-11-22T12:00",
+        "snellader": true,
+        "id": "VB-1",
+        "stekkers": [
+          "CCS",
+          "T2"
+        ],
+        "storing": 0
+      }
+    ]
+  },
+  "laadpaal": {
+    "id": "VB-1",
+    "naam": "Voorbeeld snellader",
+    "plaats": "Tilburg",
+    "beheerder": "Voorbeeld BV",
+    "max_kw": 150,
+    "vrij": 2,
+    "totaal": 4,
+    "storing": 0,
+    "bezet": 2,
+    "bijgewerkt": "2026-11-22T12:00",
+    "stekkers": [
+      "CCS",
+      "T2"
+    ]
+  },
+  "verkeer": {
+    "ouderdom_s": 40,
+    "totaal_files": 2,
+    "totaal_file_km": 4.2,
+    "bron": "NDW open data",
+    "meldingen": [
+      {
+        "soort": "file",
+        "weg": "A1",
+        "van": "afrit 24 Deventer-Oost",
+        "tot": "afrit 22 Twello",
+        "lengte_km": 2.4,
+        "vertraging_min": 10,
+        "afstand_km": 3.1,
+        "tekst": "A1: file tussen afrit 24 Deventer-Oost en afrit 22 Twello, 2,4 km, 10 min vertraging"
+      },
+      {
+        "soort": "pech",
+        "weg": "A58",
+        "bij": "De Baars",
+        "afstand_km": 2.7,
+        "tekst": "A58: stilstaand voertuig bij De Baars"
+      }
+    ]
+  },
+  "flitspalen": {
+    "totaal_nl": 900,
+    "bron": "OpenStreetMap-bijdragers (ODbL)",
+    "flitspalen": [
+      {
+        "afstand_km": 1.5,
+        "soort": "flits",
+        "limiet": 50,
+        "lat": 51.553,
+        "lon": 5.108
+      }
+    ]
+  }
+}

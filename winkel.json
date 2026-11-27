@@ -1,0 +1,137 @@
+{
+ "winkel": 1,
+ "naam": "openBolle",
+ "beschrijving": "Apps van openBolle en de community, nagekeken en gebouwd door openBolle. Ze draaien op het platform van openBolle.",
+ "website": "https://openbolle.nl",
+ "plugins": [
+  {
+   "id": "audi",
+   "naam": "Audi",
+   "versie": "1.2.0",
+   "soort": "server",
+   "kort": "Bereik, tank of accu van je Audi",
+   "lang": "Zie hoe ver je Audi nog komt, hoe vol de tank of accu is, of hij op slot staat, of er een raam open is, of hij laadt en waar hij geparkeerd staat. Vraag het aan Bolle, open de app op Bolle of zie de tank of accu op je beginscherm; Bolle meldt het als je Audi klaar is met laden. Werkt met je myAudi-account (Europa), via de onofficiële weg van de myAudi-app: Audi kan die zonder waarschuwing veranderen. Alleen lezen; op slot doen of de klimaatregeling aanzetten kan nog niet. De auto wordt nooit gewekt.",
+   "categorie": "auto",
+   "auteur": "openBolle",
+   "logo": "apps/audi/logo.png",
+   "documentatie": "apps/audi/handleiding.md",
+   "voorbeelden": [
+    "Hoe ver kom ik nog met de Audi?",
+    "Staat de auto op slot?",
+    "Laadt de Audi nog?",
+    "Waar staat mijn auto?"
+   ],
+   "bron": "https://github.com/jolynstudios/openbolle-apps/tree/main/apps/audi"
+  },
+  {
+   "id": "homey",
+   "naam": "Homey",
+   "versie": "1.2.0",
+   "soort": "server",
+   "kort": "Je huis bedienen vanuit de auto",
+   "lang": "Bedien je Homey Pro met je stem: lampen, stekkers en de thermostaat, flows starten en sferen kiezen. Een slot, het alarm of de garagedeur alleen na bevestiging en nooit tijdens het rijden. Gaat thuis een rookmelder, koolmonoxide- of watermelder af, dan meldt Bolle het. Op het scherm van Bolle (als je stilstaat): je favoriete apparaten aan of uit, je favoriete flows of je sferen starten en een open garagedeur dicht doen. Koppelen: installeer de app, kies op Bolle Menu > Apps > Homey > Koppelen en scan de QR-code met je telefoon.",
+   "categorie": "slimme-woning",
+   "auteur": "openBolle",
+   "logo": "apps/homey/logo.png",
+   "afbeeldingen": [
+    {
+     "bestand": "apps/homey/afbeeldingen/scherm.png",
+     "uitleg": "Koppel je Homey Pro met de QR-code; daarna bedien je je huis met je stem."
+    },
+    {
+     "bestand": "apps/homey/afbeeldingen/toestemming.png",
+     "uitleg": "Homey vraagt alleen wat hij nodig heeft: de assistent, tegels en een verbinding met Homey."
+    }
+   ],
+   "documentatie": "apps/homey/handleiding.md",
+   "voorbeelden": [
+    "Doe de lampen in de woonkamer aan",
+    "Zet de verwarming op 20 graden",
+    "Start de flow Bijna thuis",
+    "Is de voordeur op slot?"
+   ],
+   "bron": "https://github.com/jolynstudios/openbolle-apps/tree/main/apps/homey"
+  },
+  {
+   "id": "kilometers",
+   "naam": "Kilometers",
+   "versie": "1.1.0",
+   "soort": "server",
+   "kort": "Zakelijke en privéritten bijhouden",
+   "lang": "Houd je zakelijke en privékilometers bij met je stem, handig voor een lease- of bedrijfsauto. Zeg bij vertrek \"noteer een zakelijke rit naar Utrecht, kilometerstand 45230\" en bij aankomst de eindstand, of noteer een hele rit in één keer. Bolle telt per maand en per jaar op, zakelijk en privé apart. De app bewaart de laatste 100 ritten en de totalen per maand; het is een hulpmiddel, geen volledige rittenadministratie voor de Belastingdienst.",
+   "categorie": "auto",
+   "auteur": "openBolle",
+   "logo": "apps/kilometers/logo.png",
+   "afbeeldingen": [
+    {
+     "bestand": "apps/kilometers/afbeeldingen/scherm.png",
+     "uitleg": "Je zakelijke en privékilometers van deze maand en dit jaar, met je stem bijgehouden."
+    }
+   ],
+   "voorbeelden": [
+    "Noteer een zakelijke rit, kilometerstand 45230",
+    "De rit is klaar, eindstand 45318",
+    "Noteer 24 kilometer privé naar de sportschool",
+    "Hoeveel zakelijke kilometers deze maand?",
+    "Wis de laatste rit"
+   ],
+   "bron": "https://github.com/jolynstudios/openbolle-apps/tree/main/apps/kilometers"
+  },
+  {
+   "id": "reisgids",
+   "naam": "Reisgids",
+   "versie": "1.1.0",
+   "soort": "server",
+   "kort": "Wat is er hier te zien?",
+   "lang": "Bezienswaardigheden, gebouwen en plaatsen langs de weg, met een kort verhaal erbij. Vraag wat er in de buurt is, of laat Bolle iets vertellen over een kerk, kasteel of dorp waar je langsrijdt. Bron: Wikipedia (gratis, zonder account).",
+   "categorie": "onderweg",
+   "auteur": "openBolle",
+   "logo": "apps/reisgids/logo.png",
+   "afbeeldingen": [
+    {
+     "bestand": "apps/reisgids/afbeeldingen/scherm.png",
+     "uitleg": "Wat is er hier te zien? Bezienswaardigheden in de buurt, dichtstbij eerst."
+    },
+    {
+     "bestand": "apps/reisgids/afbeeldingen/toestemming.png",
+     "uitleg": "Reisgids vraagt je plek, afgerond op ongeveer een kilometer."
+    }
+   ],
+   "voorbeelden": [
+    "Wat is er hier te zien?",
+    "Vertel iets over deze plaats.",
+    "Wat is dat voor kasteel?",
+    "Vertel iets over de Dom van Utrecht."
+   ],
+   "bron": "https://github.com/jolynstudios/openbolle-apps/tree/main/apps/reisgids"
+  },
+  {
+   "id": "tesla",
+   "naam": "Tesla",
+   "versie": "1.2.0",
+   "soort": "server",
+   "kort": "Accu, bereik en laden van je Tesla",
+   "lang": "Zie hoe vol je Tesla is, hoe ver je nog komt, of hij laadt en of hij op slot staat. Vraag het aan Bolle, open de app op Bolle (met de knoppen Ververs en Wekken) of zie de accu op je beginscherm. Bolle meldt het als je Tesla klaar is met laden, of niet op slot staat terwijl er niemand bij is. Je gebruikt je eigen app bij Tesla (gratis tegoed van Tesla, zie de uitleg); openBolle betaalt niets en ziet je wachtwoord nooit. Een slapende Tesla wordt alleen wakker gemaakt als je daarom vraagt.",
+   "categorie": "auto",
+   "auteur": "openBolle",
+   "logo": "apps/tesla/logo.png",
+   "afbeeldingen": [
+    {
+     "bestand": "apps/tesla/afbeeldingen/scherm.png",
+     "uitleg": "Koppel je Tesla met de QR-code en zie accu, bereik en laden op Bolle."
+    },
+    {
+     "bestand": "apps/tesla/afbeeldingen/toestemming.png",
+     "uitleg": "Tesla vraagt de assistent, tegels en een verbinding met je auto."
+    }
+   ],
+   "documentatie": "apps/tesla/handleiding.md",
+   "voorbeelden": [
+    "Hoe vol is mijn Tesla?",
+    "Laadt de auto nog?",
+    "Staat de Tesla op slot?"
+   ],
+   "bron": "https://github.com/jolynstudios/openbolle-apps/tree/main/apps/tesla"
+  }
+ ]
+}

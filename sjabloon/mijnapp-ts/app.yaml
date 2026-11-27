@@ -1,0 +1,64 @@
+# Sjabloon: een app. Kopieer deze map naar apps/<jouw-id>/ en pas alles aan. Zie README.md.
+manifest: 1
+id: mijnapp-ts                 # gelijk aan de mapnaam, kleine letters, verandert nooit
+naam: Mijn app                 # max 16 tekens (past op het ronde scherm)
+versie: 0.1.0
+auteur:
+  naam: Jouw naam
+  email: jij@example.com
+  github: jouw-github-naam     # moet de indiener van de pull request zijn
+  url: https://example.com
+licentie: MIT
+beschrijving:
+  kort: Wat hij doet, kort
+  lang: >
+    Langere uitleg voor het portaal: wat de app doet, waar de gegevens vandaan komen en hoe je hem gebruikt.
+categorie: overig
+voorbeelden:
+  - Wat zegt mijn app?
+pictogram: ster
+vereist:
+  bolleos: ">=1.2.0"
+  platform: ">=1.0 <2"
+  blokken: 1
+runtime:
+  taal: node
+  geheugen_mb: 64              # node heeft wat meer nodig dan python
+  cpu: 0.1
+  tijdslimiet_ms: 2000
+  opslag_kb: 0
+rechten:
+  - spraak:tools
+  - blokken:tonen               # voor het blok hieronder; zonder blokken kan dit weg
+  - meldingen:sturen            # alleen voor de melding (bij een antwoord of uit het blok); anders weghalen
+  - vragen:stellen              # voor de knop op het scherm (POST /actie); zonder knoppen, vragen of rijen met een actie kan dit weg
+instellingen:
+  - sleutel: proefmelding       # alleen voor het sjabloon: haal dit weg als je de melding niet meer wilt proberen
+    type: schakelaar
+    label: Proefmelding
+    uitleg: Laat het blok een melding uit zichzelf geven, om te zien hoe Bolle die toont.
+    standaard: false
+tools:
+  - naam: hallo
+    beschrijving: >
+      Zegt hallo terug. Alleen gebruiken als de gebruiker vraagt om de voorbeeldapp te testen.
+    parameters:
+      type: object
+      properties:
+        naam: { type: string, description: "Naam om te begroeten" }
+    rijden: true
+    max_tekens: 200
+blokken:
+  - id: hallo
+    soort: tegel
+    titel: Hallo
+    pictogram: ster
+    verversen_s: 300
+    rijden: volledig
+    hoofdscherm: true           # dit blok toont Bolle (het hoofdblok; zonder hoofdscherm: het eerste blok)
+privacy:
+  doel: Voorbeeld.
+  gegevens:
+    - De naam die je noemt, alleen tijdens de vraag
+  bewaartermijn: Niets wordt bewaard.
+  derden: []

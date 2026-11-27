@@ -1,0 +1,21 @@
+{
+  "name": "openbolle-app",
+  "version": "1.0.0",
+  "description": "Hulpje voor een openBolle-app in TypeScript: de HTTP-server en de terugroep-API van de broker, zonder afhankelijkheden.",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/openbolle.js",
+  "types": "dist/openbolle.d.ts",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "controleer": "tsc --noEmit",
+    "bouw": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "~6.0.3"
+  }
+}

@@ -1,0 +1,5 @@
+# De winkel van openBolle: de apps in deze repo. tools/maak_winkel.py maakt er winkel.json van.
+naam: openBolle
+beschrijving: Apps van openBolle en de community, nagekeken en gebouwd door openBolle. Ze draaien op het platform van openBolle.
+website: https://openbolle.nl
+bron: https://github.com/jolynstudios/openbolle-apps/tree/main

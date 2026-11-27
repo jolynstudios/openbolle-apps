@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bolle in de browser</title>
+<style>
+  :root { --bg: #f4f2ee; --kaart: #fff; --tekst: #1d1d1b; --zacht: #6b6a66; --lijn: #e2dfd8; --accent: #e8590c; --fout: #c92a2a; --goed: #2b8a3e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--tekst); }
+  header { padding: 20px 28px; border-bottom: 1px solid var(--lijn); background: var(--kaart); display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 20px; }
+  header .plugin { color: var(--zacht); }
+  main { display: grid; grid-template-columns: 320px 1fr; gap: 24px; padding: 24px 28px; align-items: start; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  section { background: var(--kaart); border: 1px solid var(--lijn); border-radius: 12px; padding: 18px; margin-bottom: 24px; }
+  h2 { margin: 0 0 12px; font-size: 16px; }
+  h3 { margin: 0; font-size: 15px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  label { display: block; font-weight: 600; margin: 12px 0 4px; font-size: 13px; }
+  input[type=text], textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--lijn); border-radius: 8px; font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; background: #fbfaf8; }
+  textarea { min-height: 70px; resize: vertical; }
+  .rij { display: flex; gap: 8px; align-items: center; }
+  .uitleg { color: var(--zacht); font-size: 13px; margin: 4px 0 0; }
+  button { background: var(--tekst); color: #fff; border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: wait; }
+  button.licht { background: #fff; color: var(--tekst); border: 1px solid var(--lijn); }
+  .chip { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 99px; background: #efece6; color: var(--zacht); margin: 2px 4px 2px 0; }
+  .chip.let-op { background: #fff0e6; color: var(--accent); }
+  .tool { border-top: 1px solid var(--lijn); padding: 16px 0; }
+  .tool:first-of-type { border-top: 0; padding-top: 0; }
+  .tool p { margin: 6px 0; }
+  .antwoord { margin-top: 10px; padding: 12px; border-radius: 8px; background: #f7f6f3; white-space: pre-wrap; font-size: 14px; }
+  .antwoord.fout { background: #fff1f1; }
+  .status { font-weight: 700; font-size: 12px; }
+  .status.goed { color: var(--goed); } .status.fout { color: var(--fout); }
+  .notitie { color: var(--accent); font-size: 13px; margin: 6px 0 0; }
+  details { margin-top: 8px; font-size: 13px; } summary { cursor: pointer; color: var(--zacht); }
+  pre { margin: 6px 0 0; padding: 10px; background: #1d1d1b; color: #eee; border-radius: 8px; overflow: auto; font-size: 12px; }
+  .blokken { display: flex; flex-wrap: wrap; gap: 28px; }
+  .blok { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+  /* het scherm van Bolle (BolleOS 1.2, dag): 466 × 466, rond; maten in px zoals op Bolle */
+  .schermvak { --b-bg: #f2f2f0; --b-ink: #15171a; --b-muted: #5f636a; --b-card: #ffffff; --b-track: #d9d9de; --b-pil: #111214;
+               --app: #ff6a13; --op-app: #15171a; width: 466px; height: 466px; position: relative; flex: none; }
+  @media (max-width: 560px) { .schermvak { zoom: .68; } }
+  .scherm { position: absolute; inset: 0; border-radius: 50%; background: var(--b-bg); color: var(--b-ink); overflow: hidden;
+            box-shadow: 0 0 0 9px #ff6a13, 0 0 0 12px #2a2a2a, 0 8px 30px rgba(0,0,0,.25); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; user-select: none; }
+  .scherm * { box-sizing: border-box; }
+  .scherm svg.ringen { position: absolute; inset: 0; width: 466px; height: 466px; pointer-events: none; }
+  .scherm .kol { position: absolute; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .scherm .label { display: flex; gap: 8px; align-items: center; color: var(--b-muted); font-size: 22px; font-weight: 600; max-width: 260px; }
+  .scherm .label span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .scherm .label .logo, .scherm .label .pic { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; flex: none; background: #e4e4e1; font-size: 9px; display: flex; align-items: center; justify-content: center; color: var(--b-muted); }
+  .scherm .label .logo img { width: 100%; height: 100%; object-fit: cover; }
+  .scherm .groot { font-weight: 800; line-height: 1; letter-spacing: -1px; }
+  .scherm .mat { color: var(--b-muted); font-weight: 600; }
+  .scherm .een { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .scherm .knop { margin-top: 14px; background: var(--app); color: var(--op-app); border-radius: 30px; padding: 10px 22px; font-size: 24px; font-weight: 700; display: inline-flex; gap: 8px; align-items: center; cursor: pointer; }
+  .scherm .klem2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .scherm .klem3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .scherm .puntjes { position: absolute; z-index: 2; bottom: 44px; left: 0; right: 0; display: flex; gap: 10px; justify-content: center; }
+  .scherm .puntjes i { width: 10px; height: 10px; border-radius: 5px; background: var(--b-track); box-shadow: 0 0 0 2px var(--b-bg); }
+  .scherm .puntjes i.nu { width: 22px; background: var(--app); }
+  .scherm .helft { position: absolute; top: 0; bottom: 0; width: 233px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 128px; gap: 6px; font-size: 30px; font-weight: 700; }
+  .scherm .pil { position: absolute; top: 52px; left: 68px; width: 330px; background: var(--b-pil); color: #fff; border-radius: 28px; padding: 12px 16px; text-align: center; }
+  .scherm .pil .t { font-size: 28px; font-weight: 700; line-height: 1.12; } .scherm .pil .u { font-size: 19px; color: #b9bcc2; margin-top: 4px; }
+  .scherm .lijstkop { position: absolute; top: 44px; left: 0; right: 0; text-align: center; font-size: 28px; font-weight: 700; color: var(--b-muted); }
+  .scherm .rijen { position: absolute; top: 96px; left: 0; right: 0; bottom: 0; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; padding-bottom: 100px; scrollbar-width: none; }
+  .scherm .rij2 { width: 330px; min-height: 84px; flex: none; border-radius: 42px; background: var(--b-card); display: flex; align-items: center; gap: 12px; padding: 0 22px; font-size: 27px; font-weight: 700; }
+  .scherm .rij2.tik { cursor: pointer; } .scherm .rij2 .tx { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .scherm .rij2 .w { font-size: 20px; color: var(--b-muted); font-weight: 600; }
+  .scherm .sch { width: 58px; height: 36px; border-radius: 18px; background: var(--b-track); position: relative; flex: none; }
+  .scherm .sch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 28px; height: 28px; border-radius: 14px; background: var(--b-muted); }
+  .scherm .sch.aan { background: var(--app); } .scherm .sch.aan::after { left: 26px; background: var(--op-app); }
+  .scherm .pic { font: 600 11px ui-monospace, Menlo, monospace; color: var(--b-muted); }
+  .scherm svg.wiggen path { cursor: pointer; }
+  .scherm .vol { position: absolute; inset: 0; background: var(--app); color: var(--op-app); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px; gap: 6px; }
+  .scherm .vol .t { font-size: 44px; font-weight: 800; line-height: 1.05; } .scherm .vol .n { font-size: 22px; }
+  .scherm .toast { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); background: var(--b-pil); color: #fff; border-radius: 22px; padding: 8px 18px; font-size: 20px; font-weight: 600; white-space: nowrap; }
+  .scherm .leeg { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--b-muted); font-size: 26px; padding: 70px; text-align: center; gap: 8px; }
+  .scherm .band { position: absolute; left: 0; right: 0; top: 0; height: 168px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 22px; gap: 8px; color: #111; }
+  .scherm .band .ic { font: 700 14px ui-monospace, Menlo, monospace; background: rgba(0,0,0,.12); border-radius: 18px; padding: 4px 10px; }
+  .scherm .band .t { font-size: 26px; font-weight: 800; max-width: 330px; text-align: center; line-height: 1.1; }
+  .scherm .balk { position: absolute; left: 0; right: 0; top: 255px; bottom: 0; display: flex; flex-direction: column; align-items: center; padding: 14px 64px 0; gap: 6px; color: #fff; text-align: center; }
+  .scherm .balk .l { font-size: 20px; font-weight: 700; } .scherm .balk .t { font-size: 27px; font-weight: 800; line-height: 1.1; } .scherm .balk .w { font-size: 18px; opacity: .85; }
+  .bladeren { display: flex; gap: 8px; align-items: center; justify-content: center; }
+  .bladeren button { padding: 4px 12px; }
+  .schermvak.klein { zoom: .5; }
+  @media (max-width: 560px) { .schermvak.klein { zoom: .4; } }
+  .blok-rij { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+  .elders { display: flex; flex-direction: column; gap: 14px; min-width: 260px; max-width: 360px; flex: 1; }
+  .elders h4 { margin: 0 0 6px; font-size: 13px; color: var(--zacht); font-weight: 600; }
+  .thuis { background: #000; color: #fff; border-radius: 99px; padding: 8px 16px; font-size: 15px; display: inline-flex; gap: 8px; align-items: center; }
+  .thuis .pic { color: #a9a7a1; font-size: 11px; border: 1px solid #444; border-radius: 99px; padding: 0 6px; }
+  .menurij { background: #1d1d1b; color: #fff; border-radius: 14px; padding: 10px 14px; display: flex; gap: 12px; align-items: center; }
+  .menurij .logo { width: 32px; height: 32px; border-radius: 50%; background: #2a2a28; overflow: hidden; font-size: 9px; color: #ddd; display: flex; align-items: center; justify-content: center; flex: none; }
+  .menurij .logo img { width: 100%; height: 100%; object-fit: cover; }
+  .menurij .naam { flex: 1; } .menurij .rechts { color: #a9a7a1; font-size: 13px; }
+  .assistent { margin: 0; padding-left: 20px; font-size: 13px; } .assistent li.weg { color: var(--zacht); text-decoration: line-through; }
+  .melding-stand { font-size: 13px; margin: 6px 0 0; } .melding-stand.goed { color: var(--goed); } .melding-stand.al { color: var(--zacht); }
+  .leeg-tekst { color: var(--zacht); }
+  .bolle-stand { font-size: 13px; margin: 8px 0; } .bolle-stand.goed { color: var(--goed); } .bolle-stand.fout { color: var(--fout); }
+  .knoppen { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  dialog#live { border: 0; border-radius: 18px; padding: 20px; background: #161615; color: #eee; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+  dialog#live::backdrop { background: rgba(0,0,0,.35); }
+  #live .kop { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 12px; }
+  #live h2 { color: #fff; margin: 0; }
+  #live canvas { width: 466px; height: 466px; max-width: 80vw; max-height: 80vw; border-radius: 50%; display: block; margin: 0 auto; cursor: pointer; background: #000; image-rendering: auto; }
+  #live .onder { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 14px; }
+  #live button.licht { background: #2a2a28; color: #eee; border-color: #3a3a37; }
+  #live .klein { color: #9a9892; font-size: 12px; text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Bolle in de browser</h1>
+  <span class="plugin" id="plugin">laden ...</span>
+  <span id="rechten"></span>
+</header>
+<main>
+  <div>
+    <section>
+      <h2>Context</h2>
+      <p class="uitleg">Zo stuurt de broker hem mee bij elke aanroep. Plek en rijden gaan alleen mee als de app het recht heeft.</p>
+      <label for="plek">Plek (lat,lon)</label>
+      <input type="text" id="plek" placeholder="52.09,5.12">
+      <p class="uitleg" id="plek-uitleg"></p>
+      <label class="rij"><input type="checkbox" id="rijdt"> De auto rijdt</label>
+      <p class="uitleg" id="rijdt-uitleg"></p>
+      <label for="instellingen">Instellingen (JSON)</label>
+      <textarea id="instellingen" spellcheck="false">{}</textarea>
+      <p class="uitleg" id="instellingen-uitleg"></p>
+    </section>
+    <section>
+      <h2>Je eigen Bolle</h2>
+      <p class="uitleg">Sluit Bolle met USB aan en zet hem in de debugstand. Je app staat dan ook op Bolle zelf, bovenaan in Menu → Apps: kies Openen voor zijn scherm. Ook het antwoord en de melding van elke tool komen op Bolle, en een melding uit je blok (één keer, zoals de broker).</p>
+      <p class="bolle-stand" id="bolle-stand">Niet verbonden.</p>
+      <div class="knoppen">
+        <button id="bolle-verbind">Verbind je Bolle</button>
+        <button class="licht" id="bolle-debug" hidden>Debugstand aan</button>
+        <button class="licht" id="bolle-live" hidden>Live meekijken</button>
+      </div>
+      <p class="uitleg" id="bolle-uitleg">Werkt in Chrome en Edge (Web Serial). Of start met <code>dev --bolle</code>.</p>
+    </section>
+  </div>
+  <div>
+    <section>
+      <h2>Spraakfuncties (tools)</h2>
+      <div id="tools"></div>
+    </section>
+    <section>
+      <h2>Blokken</h2>
+      <p class="uitleg">Bolle tekent je blok zelf, in een van vijf soorten scherm (waarde, kaarten, vraag, lijst, knoppen; tot 4 schermen), als regel op het beginscherm ("naam waarde") en als melding (alarm of bericht). Tik op een knop, rij of helft: dat gaat als antwoord naar je app (POST /actie), en Bolle toont wat je app terugzegt. Alleen het hoofdblok komt op Bolle (hoofdscherm: true, anders het eerste). Verversen doet wat Bolle elke 2 minuten doet: de lijst ophalen, met de melding als die nieuw is.</p>
+      <div class="blokken" id="blokken"></div>
+    </section>
+  </div>
+</main>
+<dialog id="live">
+  <div class="kop"><h2>Je Bolle, live</h2><button class="licht" id="live-dicht">Sluiten</button></div>
+  <canvas id="live-scherm" width="233" height="233"></canvas>
+  <p class="klein" id="live-stand">Even kijken ...</p>
+  <div class="onder">
+    <button class="licht" data-ui="plugin">Je app</button>
+    <button class="licht" data-ui="UI menu plugins">Apps</button>
+    <button class="licht" data-ui="UI home">Beginscherm</button>
+    <button class="licht" id="live-pauze">Pauze</button>
+  </div>
+  <p class="klein">Tik op het scherm om op Bolle te tikken.</p>
+</dialog>
+<script>
+const $ = (id) => document.getElementById(id);
+function el(tag, attrs = {}, ...kinderen) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) if (k === "class") e.className = v; else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v);
+  for (const k of kinderen) if (k !== null && k !== undefined) e.append(k);
+  return e;
+}
+
+function context() {
+  let instellingen;
+  try { instellingen = JSON.parse($("instellingen").value || "{}"); }
+  catch { throw new Error("Instellingen zijn geen geldige JSON."); }
+  return { plek: $("plek").value.trim(), rijdt: $("rijdt").checked, instellingen };
+}
+
+async function post(url, body) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json();
+  if (!r.ok && j.fout) throw new Error(j.fout);
+  return j;
+}
+
+function details(titel, obj) { return el("details", {}, el("summary", {}, titel), el("pre", {}, JSON.stringify(obj, null, 2))); }
+
+function toonAntwoord(doel, j) {
+  doel.replaceChildren();
+  const fout = j.isError || j.fout;
+  doel.append(el("div", { class: "status " + (fout ? "fout" : "goed") }, j.fout ? "fout" : `isError: ${Boolean(j.isError)}` + (j.ms !== undefined ? ` · ${j.ms} ms` : "") + (j.door_broker ? " · geweigerd door de broker" : "")));
+  doel.append(el("div", { class: "antwoord" + (fout ? " fout" : "") }, j.fout ?? j.tekst ?? ""));
+  for (const n of j.notities ?? []) doel.append(el("p", { class: "notitie" }, n));
+  if (j.context) doel.append(details("context die meeging", j.context));
+  if (j.antwoord) doel.append(details("ruw antwoord van de app", j.antwoord));
+}
+
+function parameterUitleg(p) {
+  const props = p?.properties ?? {};
+  const namen = Object.keys(props);
+  if (!namen.length) return "Geen argumenten.";
+  return "Argumenten: " + namen.map((n) => `${n}${(p.required ?? []).includes(n) ? " (verplicht)" : ""} (${props[n].type ?? "?"})${props[n].description ? ": " + props[n].description : ""}`).join("; ");
+}
+
+function toolKaart(t) {
+  const args = el("textarea", { spellcheck: "false" }, "{}");
+  const uit = el("div");
+  const knop = el("button", { onclick: async () => {
+    knop.disabled = true;
+    try {
+      let a;
+      try { a = JSON.parse(args.value || "{}"); } catch { throw new Error("De argumenten zijn geen geldige JSON."); }
+      const j = await post("/api/tool", { naam: t.naam, argumenten: a, ...context() });
+      if (bolle.modus === "browser" && !j.fout) {
+        try {
+          await bolle.usb.stuurJson("antwoord", bolle.lib.antwoordVoorBolle(j.voor_het_model ?? j.tekst));
+          if (j.melding) await bolle.usb.stuurJson("melding", j.melding);
+          (j.notities ??= []).push("Ook op je Bolle getoond (berichten" + (j.melding ? " en melding" : "") + ").");
+        } catch (e) { (j.notities ??= []).push("Niet op je Bolle: " + e.message); }
+      }
+      toonAntwoord(uit, j);
+    } catch (e) { toonAntwoord(uit, { fout: e.message }); }
+    finally { knop.disabled = false; }
+  } }, "Aanroepen");
+  const chips = el("div");
+  if (t.bevestigen) chips.append(el("span", { class: "chip let-op" }, "bevestigen"));
+  if (t.rijden === false) chips.append(el("span", { class: "chip let-op" }, "niet tijdens het rijden"));
+  chips.append(el("span", { class: "chip" }, `max ${t.max_tekens ?? 600} tekens`));
+  return el("div", { class: "tool" },
+    el("h3", {}, t.naam), chips,
+    el("p", {}, t.beschrijving),
+    el("p", { class: "uitleg" }, parameterUitleg(t.parameters)),
+    args, el("div", { class: "rij", style: "margin-top:8px" }, knop), uit);
+}
+
+/* de kleuren van BolleOS voor een alarm (schema/bolleos.json; de waarden uit de naslag) */
+const KLEUREN = { controle: "#19D3F3", mobiel: "#2F6BFF", traject: "#6A5CFF", gevaar: "#FF8A1F", ernstig: "#E5352B", info: "#5AC8FA", telefoon: "#34C759", agenda: "#B58CFF", ok: "#34C759" };
+const BOLLE = "#FF6A13";                                    /* de kleur van Bolle (standaard) */
+const meet = document.createElement("canvas").getContext("2d");
+function breedte(t, px, gewicht = 800) { meet.font = `${gewicht} ${px}px system-ui, -apple-system, "Segoe UI", sans-serif`; return meet.measureText(t).width; }
+/* tekst op een kleur: zwart of wit, zoals ui_on_color() */
+function opKleur(hex) { const n = parseInt(String(hex).slice(1), 16), l = 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255); return l > 150 ? "#15171a" : "#ffffff"; }
+const isGetal = (s) => /^[0-9,.:\-/%°]+$/.test(String(s ?? ""));
+function logoEl(klasse = "logo") {
+  return el("div", { class: klasse }, manifest.logo ? el("img", { src: "/api/logo", alt: "" }) : manifest.pictogram ?? "");
+}
+const ns = "http://www.w3.org/2000/svg";
+function svgEl(tag, a) { const e = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(a)) e.setAttribute(k, v); return e; }
+
+/* de soort die Bolle kiest (plugins_blok.c, scherm_lees) */
+function soortVan(s) {
+  const nk = (s.kaarten ?? []).length, nr = (s.rijen ?? []).length, nkn = (s.knoppen ?? []).length, vr = s.vraag?.tekst;
+  if (s.soort === "vraag" && vr) return "vraag";
+  if (s.soort === "knoppen" && nkn >= 2) return "knoppen";
+  if (s.soort === "lijst" && nr) return "lijst";
+  if (s.soort === "kaarten" || s.soort === "waarde") return s.soort;
+  if (vr) return "vraag"; if (nkn >= 2) return "knoppen"; if (nr) return "lijst"; if (nk) return "kaarten";
+  if (s.waarde || typeof s.meter === "number" || typeof s.meter2 === "number") return "waarde";
+  return "kaarten";
+}
+/* alle pagina's die je op Bolle doorveegt: elk scherm, en bij kaarten één pagina per kaart (zoals plugins_blok.c) */
+function paginas(blok) {
+  const regels = blok.regels ?? [];
+  const basis = blok.schermen?.length ? blok.schermen.map((s) => ({ ...s, titel: s.titel || blok.titel })) : [blok];
+  const uit = [];
+  for (const s0 of basis) {
+    const s = { ...s0 }, soort = soortVan(s);
+    if (soort === "kaarten") {
+      const k = s.kaarten?.length ? s.kaarten : regels.map((t) => ({ titel: t }));     /* oud blok: elke regel een kaart */
+      k.forEach((kaart, i) => uit.push({ soort, s, kaart, i, n: k.length }));
+      continue;
+    }
+    if (soort === "waarde") {
+      if (!s.waarde && typeof s.meter !== "number" && typeof s.meter2 !== "number") continue;      /* leeg: overslaan */
+      if (typeof s.meter !== "number" && typeof s.meter2 === "number") { s.meter = s.meter2; delete s.meter2; }
+      if (!s.regel && regels.length) s.regel = regels[0];
+    }
+    uit.push({ soort, s });
+  }
+  return uit;
+}
+
+function label(titel) { return el("div", { class: "label" }, logoEl(), el("span", {}, titel || manifest.naam)); }
+function knopEl(k, doe) {
+  return el("div", { class: "knop", title: `actie ${k.actie} (tik)`, onclick: (e) => { e.stopPropagation(); doe({ actie: k.actie, antwoord: "tik" }); } },
+    k.pictogram ? el("span", { class: "pic", style: "color:inherit" }, k.pictogram) : null, k.tekst);
+}
+function ringen(meter, meter2) {
+  const svg = svgEl("svg", { class: "ringen", viewBox: "0 0 466 466" });
+  const boog = (r, kleur, deel, breed, opa = 1) => {
+    const c = 2 * Math.PI * r;
+    if (deel > 0) svg.append(svgEl("circle", { cx: 233, cy: 233, r, fill: "none", stroke: kleur, "stroke-width": breed, "stroke-linecap": "round", opacity: opa,
+      "stroke-dasharray": `${c * deel} ${c}`, transform: "rotate(135 233 233)" }));
+  };
+  const app = "var(--app)";
+  if (typeof meter === "number") { boog(213, "var(--b-track)", 0.75, 12); boog(213, app, 0.75 * meter / 100, 12); }
+  if (typeof meter2 === "number") { boog(193, "var(--b-track)", 0.75, 10); boog(193, app, 0.75 * meter2 / 100, 10, 0.55); }
+  return svg;
+}
+
+/* één pagina tekenen, zoals ui_plugin.c; doe(actie) stuurt een antwoord naar de app */
+function tekenPagina(scherm, p, doe, pagina, totaal) {
+  const s = p.s;
+  if (p.soort === "waarde") {
+    if (typeof s.meter === "number" || typeof s.meter2 === "number") scherm.append(ringen(s.meter, s.meter2));
+    const w = String(s.waarde ?? ""), px = isGetal(w) && breedte(w, 118) <= 320 ? 118 : breedte(w, 64) <= 330 ? 64 : 46;
+    const kol = el("div", { class: "kol", style: "top:50%;transform:translate(-50%,-50%);width:380px" }, label(s.titel),
+      el("div", { class: "groot", style: `font-size:${px}px;max-width:340px` }, w));
+    if (s.eenheid) kol.append(el("div", { class: "mat", style: "font-size:22px" }, s.eenheid));
+    if (s.regel) kol.append(el("div", { class: "mat een", style: "font-size:30px;width:300px;margin-top:10px" }, s.regel));
+    if (s.knop) kol.append(knopEl(s.knop, doe));
+    scherm.append(kol);
+  } else if (p.soort === "kaarten") {
+    const k = p.kaart, groot = breedte(k.titel, 46) <= 342 * 2;
+    const kol = el("div", { class: "kol", style: "top:50%;transform:translate(-50%,-56%);width:360px" }, label(s.titel),
+      el("div", { class: "groot " + (groot ? "klem2" : "klem3"), style: `font-size:${groot ? 46 : 30}px;margin-top:12px;width:342px;line-height:1.05` }, k.titel));
+    if (k.tekst) kol.append(el("div", { class: "mat klem2", style: "font-size:28px;margin-top:8px;width:320px;line-height:1.1" }, k.tekst));
+    if (k.bron) kol.append(el("div", { class: "mat", style: "font-size:21px;margin-top:8px" }, k.bron));
+    if (k.knop) kol.append(knopEl(k.knop, doe));
+    scherm.append(kol);
+  } else if (p.soort === "vraag") {
+    const v = s.vraag;
+    scherm.append(el("div", { class: "helft", style: "left:0;background:var(--app);color:var(--op-app);padding-left:28px", onclick: () => doe({ actie: v.actie ?? "", antwoord: "ja" }) },
+      el("div", { style: "font-size:52px;line-height:1" }, "✓"), v.ja || "Ja"));
+    scherm.append(el("div", { class: "helft", style: "left:233px;background:var(--b-card);padding-right:28px", onclick: () => doe({ actie: v.actie ?? "", antwoord: "nee" }) },
+      el("div", { style: "font-size:52px;line-height:1" }, "✕"), v.nee || "Nee"));
+    scherm.append(el("div", { class: "pil" }, el("div", { class: "pic", style: "color:#b9bcc2" }, manifest.pictogram ?? ""), el("div", { class: "t" }, v.tekst),
+      v.uitleg ? el("div", { class: "u" }, v.uitleg) : null));
+  } else if (p.soort === "lijst") {
+    scherm.append(el("div", { class: "lijstkop" }, s.titel || manifest.naam));
+    const rijen = el("div", { class: "rijen" });
+    for (const r of s.rijen) {
+      const rechts = typeof r.aan === "boolean" ? el("div", { class: "sch" + (r.aan ? " aan" : "") }) : r.waarde ? el("div", { class: "w" }, r.waarde) : null;
+      rijen.append(el("div", { class: "rij2" + (r.actie ? " tik" : ""), title: r.actie ? `actie ${r.actie}` : "alleen om te lezen",
+        onclick: () => { if (!r.actie) return; const antw = typeof r.aan === "boolean" ? (r.aan ? "uit" : "aan") : "tik"; doe({ actie: r.actie, antwoord: antw, schakelaar: typeof r.aan === "boolean" }); } },
+        r.pictogram ? el("span", { class: "pic" }, r.pictogram) : null, el("span", { class: "tx" }, r.tekst), rechts));
+    }
+    if (s.rijen.length <= 3) rijen.style.justifyContent = "center";
+    scherm.append(rijen);
+  } else if (p.soort === "knoppen") {
+    const k = s.knoppen.slice(0, 4), n = k.length;
+    const hoeken = n === 4 ? [0, 90, 180, 270] : n === 3 ? [0, 120, 240] : [270, 90];   /* boven, rechts, onder, links */
+    const svg = svgEl("svg", { class: "ringen wiggen", viewBox: "0 0 466 466", style: "pointer-events:auto" });
+    const pt = (r, g) => [233 + r * Math.sin(g * Math.PI / 180), 233 - r * Math.cos(g * Math.PI / 180)];
+    const R = 226, r0 = 96, gat = 3;
+    k.forEach((x, i) => {
+      const a0 = hoeken[i] - 180 / n + gat, a1 = hoeken[i] + 180 / n - gat, groot = a1 - a0 > 180 ? 1 : 0;
+      const [x0, y0] = pt(R, a0), [x1, y1] = pt(R, a1), [x2, y2] = pt(r0, a1), [x3, y3] = pt(r0, a0);
+      const pad = svgEl("path", { d: `M${x0} ${y0} A${R} ${R} 0 ${groot} 1 ${x1} ${y1} L${x2} ${y2} A${r0} ${r0} 0 ${groot} 0 ${x3} ${y3} Z`, fill: "var(--app)" });
+      pad.addEventListener("click", () => doe({ actie: x.actie, antwoord: "tik" }));
+      const t = document.createElementNS(ns, "title"); t.textContent = `actie ${x.actie}`; pad.append(t);
+      svg.append(pad);
+      const [tx, ty] = pt(163, hoeken[i]);
+      const tekst = svgEl("text", { x: tx, y: ty + 14, "text-anchor": "middle", fill: "var(--op-app)", "font-size": 26, "font-weight": 700, "pointer-events": "none" });
+      tekst.textContent = x.tekst; svg.append(tekst);
+      if (x.pictogram) { const pi = svgEl("text", { x: tx, y: ty - 16, "text-anchor": "middle", fill: "var(--op-app)", "font-size": 12, "font-family": "ui-monospace, Menlo, monospace", "pointer-events": "none" }); pi.textContent = x.pictogram; svg.append(pi); }
+    });
+    scherm.append(svg);
+    scherm.append(el("div", { class: "kol", style: "top:50%;transform:translate(-50%,-50%);width:160px;gap:6px" },
+      el("div", { class: "label", style: "flex-direction:column;gap:6px" }, logoEl(), el("span", { style: "font-size:20px;max-width:150px" }, s.titel || manifest.naam))));
+  }
+  if (totaal > 1) scherm.append(el("div", { class: "puntjes" }, ...Array.from({ length: totaal }, (_, i) => el("i", { class: i === pagina ? "nu" : "" }))));
+}
+
+/* het alarm (zoals een flitser) en het bericht (zoals WhatsApp) */
+function alarmScherm(m) {
+  const kleur = KLEUREN[m.kleur ?? "info"] ?? "#5AC8FA";
+  return el("div", { class: "schermvak klein" }, el("div", { class: "scherm" },
+    el("div", { class: "band", style: `background:${kleur}` }, el("div", { class: "ic" }, m.icoon), el("div", { class: "t" }, m.titel)),
+    el("div", { class: "leeg", style: "top:168px;font-size:22px" }, m.geluid ? `geluid ${m.geluid}` : "stil")));
+}
+function berichtScherm(m, appKleur) {
+  const kleur = m.kleur ?? appKleur ?? BOLLE;
+  return el("div", { class: "schermvak klein" }, el("div", { class: "scherm" },
+    el("div", { class: "leeg", style: "bottom:211px;font-size:22px" }, "(het scherm dat open is)"),
+    el("div", { class: "balk", style: `background:${kleur};color:${opKleur(kleur)}` },
+      el("div", { class: "l" }, `✉ ${manifest.naam} · ${m.titel}`), el("div", { class: "t" }, m.tekst ?? ""), el("div", { class: "w" }, "tik = weg"))));
+}
+
+function meldingVoorbeeld(j, ververs, kop = "Melding uit zichzelf") {
+  const m = j.melding;
+  const stand = j.hoofdblok === false ? ["al", "Geen hoofdblok: deze melding gaat niet naar Bolle."]
+    : j.melding_naar_bolle ? ["goed", "Gaat nu naar Bolle (de eerste keer), ook tijdens het rijden."]
+    : ["al", "Al gestuurd: Bolle krijgt hem niet nog eens. Een nieuwe id (of titel) is een nieuwe melding."];
+  const vergeet = el("button", { class: "licht", onclick: async () => { await post("/api/melding/vergeet", {}); ververs?.(); } }, "Vergeet gestuurde melding");
+  const bericht = m.vorm === "bericht";
+  return el("div", {},
+    el("h4", {}, `${kop}: ${bericht ? "bericht (zoals WhatsApp, daarna in Berichten)" : "alarm (zoals een flitser)"}`),
+    bericht ? berichtScherm(m, j.blok?.kleur) : alarmScherm(m),
+    el("p", { class: "melding-stand " + stand[0] }, stand[1]),
+    j.hoofdblok && ververs ? el("div", { class: "knoppen" }, vergeet) : null);
+}
+
+function elders(j, ververs) {
+  const delen = [];
+  if (j.lijst) {
+    const thuis = j.thuis
+      ? el("div", { class: "thuis" }, el("span", { class: "pic" }, j.lijst.pictogram), j.thuis)
+      : el("p", { class: "uitleg" }, j.lijst.koppelen ? "Niets: eerst koppelen (Menu → Apps). Daarna staat hier de naam met de waarde." : "Niets: zonder waarde (ook niet in een waarde-scherm) staat je app niet op het beginscherm.");
+    delen.push(el("div", {}, el("h4", {}, "Beginscherm (om de beurt met de temperatuur)"), thuis));
+    delen.push(el("div", {}, el("h4", {}, "Menu → Apps (alleen beheer: Openen, Koppelen, Verwijderen)"),
+      el("div", { class: "menurij" }, logoEl(), el("span", { class: "naam" }, j.lijst.naam), j.lijst.koppelen ? el("span", { class: "rechts" }, "koppelen") : null)));
+  }
+  if (j.blok.regels.length) {
+    delen.push(el("div", {}, el("h4", {}, "De assistent leest (tik op het scherm; niet op het scherm zelf)"),
+      el("ol", { class: "assistent" }, ...j.blok.regels.map((r) => el("li", {}, r)))));
+  }
+  if (j.melding) delen.push(meldingVoorbeeld(j, ververs));
+  return delen;
+}
+
+function blokKaart(b) {
+  const vak = el("div", { class: "schermvak" }), scherm = el("div", { class: "scherm" }); vak.append(scherm);
+  const onder = el("p", { class: "uitleg", style: "text-align:center;margin:0;max-width:466px" });
+  const bladeren = el("div", { class: "bladeren" });
+  const zij = el("div", { class: "elders" });
+  const extra = el("div", { style: "max-width:466px" });
+  const antwoorden = el("div", { style: "max-width:466px" });
+  const hoofd = b.id === hoofdId;
+  let laatste = null, pagina = 0, bezig = false, bevestiging = null;
+
+  function teken() {
+    scherm.replaceChildren(); bladeren.replaceChildren();
+    if (!laatste) return;
+    const kleur = laatste.blok.kleur ?? BOLLE;
+    vak.style.setProperty("--app", kleur); vak.style.setProperty("--op-app", opKleur(kleur));
+    if (bevestiging) {                                     /* zoals "Gemeld": over het hele scherm, in de kleur van de app */
+      scherm.append(el("div", { class: "vol" }, el("div", { style: "font-size:80px;line-height:1" }, "✓"), el("div", { class: "t" }, bevestiging), el("div", { class: "n" }, manifest.naam)));
+      return;
+    }
+    const ps = paginas(laatste.blok);
+    if (!ps.length) { scherm.append(el("div", { class: "leeg" }, logoEl(), "Deze app laat hier niets zien")); onder.textContent = ""; return; }
+    pagina = Math.max(0, Math.min(pagina, ps.length - 1));
+    tekenPagina(scherm, ps[pagina], doe, pagina, ps.length);
+    const p = ps[pagina];
+    onder.textContent = `Pagina ${pagina + 1} van ${ps.length}: ${p.soort}${laatste.blok.schermen?.length ? ` (${laatste.blok.schermen.length} schermen)` : ""}. `
+      + ({ waarde: "Tik = Bolle leest de waarde en de regels voor.", kaarten: "Vegen = volgende kaart; tik = voorlezen.", vraag: "Tik op een helft om te antwoorden.",
+           lijst: "Tik op een rij met een actie (een schakelaar gaat meteen om).", knoppen: "Tik op een knop." }[p.soort] ?? "");
+    if (ps.length > 1) {
+      bladeren.append(el("button", { class: "licht", onclick: () => { pagina = pagina > 0 ? pagina - 1 : pagina; teken(); } }, "‹ terug"),
+        el("span", { class: "uitleg" }, `${pagina + 1} / ${ps.length}`),
+        el("button", { class: "licht", onclick: () => { pagina = Math.min(ps.length - 1, pagina + 1); teken(); } }, "verder ›"));
+    }
+  }
+  function toast(t) { const e = el("div", { class: "toast" }, t); scherm.append(e); setTimeout(() => e.remove(), 2200); }
+
+  /* een antwoord naar de app, zoals Bolle het stuurt (POST /v1/apps/<id>/actie) */
+  async function doe(a) {
+    if (bezig) return;
+    let ctx; try { ctx = context(); } catch (e) { return toast(e.message); }
+    if (ctx.rijdt) { toast("Kan alleen als je stilstaat"); }
+    bezig = true;
+    try {
+      const j = await post("/api/actie", { ...ctx, blok: laatste?.blok.blok ?? "", actie: a.actie, antwoord: a.antwoord });
+      antwoorden.replaceChildren(...[el("h4", {}, `Antwoord ${a.antwoord} op ${a.actie || "(geen actie)"}: HTTP ${j.status}`),
+        el("div", { class: "antwoord" + (j.status === 200 ? "" : " fout") }, j.tekst), ...(j.notities ?? []).map((n) => el("p", { class: "notitie" }, n)),
+        j.antwoord ? details("ruw antwoord van de app op POST /actie", j.antwoord) : null,
+        j.melding ? meldingVoorbeeld({ ...j, hoofdblok: true, blok: laatste?.blok }, null, "Melding bij het antwoord") : null].filter(Boolean));
+      if (bolle.modus === "browser" && j.melding && j.melding_naar_bolle) { try { await bolle.usb.stuurJson("melding", j.melding); } catch { /* weg */ } }
+      if (ctx.rijdt) return;
+      if (a.schakelaar && j.status === 200) toast(j.tekst);                 /* een schakelaar: een korte regel */
+      else { bevestiging = j.tekst; teken(); await new Promise((r) => setTimeout(r, 2600)); bevestiging = null; }
+      await ververs({ meld: false });                                       /* Bolle haalt daarna het blok opnieuw */
+    } catch (e) { toast(e.message); }
+    finally { bezig = false; }
+  }
+
+  /* meld: zoals Bolle de lijst ophaalt (met de melding, één keer); false: Bolle opent het scherm (zonder melding) */
+  async function ververs(opties = {}) {
+    knop.disabled = true;
+    try {
+      const j = await post("/api/blok/" + encodeURIComponent(b.id), { ...context(), meld: opties.meld !== false });
+      if (bolle.modus === "browser" && !j.fout && j.hoofdblok) {
+        try {
+          await bolle.usb.stuurJson("blok", bolle.lib.blokVoorBolle(j.blok));
+          if (j.melding && j.melding_naar_bolle) await bolle.usb.stuurJson("melding", j.melding);
+          (j.notities ??= []).push("Ook op je Bolle gezet" + (j.melding && j.melding_naar_bolle ? ", met de melding." : "."));
+        } catch (e) { (j.notities ??= []).push("Niet op je Bolle: " + e.message); }
+      }
+      extra.replaceChildren(); zij.replaceChildren();
+      if (j.fout) { laatste = null; scherm.replaceChildren(el("div", { class: "leeg" }, j.fout)); onder.textContent = ""; }
+      else { laatste = j; teken(); zij.append(...elders(j, () => ververs())); }
+      for (const n of j.notities ?? []) extra.append(el("p", { class: "notitie" }, n));
+      if (j.lijst) extra.append(details("item in /v1/apps (wat Bolle van de broker krijgt)", j.lijst));
+      if (j.blok) extra.append(details("blok zoals Bolle het krijgt (GET /v1/apps/<id>/blok)", j.blok));
+      if (j.antwoord) extra.append(details("ruw antwoord van de app", j.antwoord));
+    } catch (e) {
+      laatste = null; scherm.replaceChildren(el("div", { class: "leeg" }, e.message));
+    } finally { knop.disabled = false; }
+  }
+  const knop = el("button", { class: "licht", onclick: () => ververs() }, "Verversen");
+  scherm.replaceChildren(el("div", { class: "leeg" }, "laden ..."));
+  setTimeout(ververs, 0);
+  verversers.set(b.id, ververs);
+  return el("div", { class: "blok" },
+    el("div", { class: "rij" }, el("strong", {}, b.id), el("span", { class: "chip" }, b.soort),
+      el("span", { class: "chip" + (hoofd ? "" : " let-op") }, hoofd ? "hoofdblok: dit toont Bolle" : "niet op Bolle (geen hoofdblok)"),
+      b.rijden ? el("span", { class: "chip" }, "rijden: " + b.rijden) : null, knop),
+    el("div", { class: "blok-rij" }, el("div", { style: "display:flex;flex-direction:column;gap:10px;align-items:center" }, vak, bladeren, onder), zij), antwoorden, extra);
+}
+
+/* ---------- je eigen Bolle: via de server (dev --bolle) of via Web Serial in deze browser ---------- */
+const verversers = new Map();
+let manifest = null, hoofdId = null;
+const bolle = { modus: null, usb: null, lib: null, poort: null };
+function bolleStand(tekst, soort = "") { const e = $("bolle-stand"); e.textContent = tekst; e.className = "bolle-stand " + soort; }
+async function bolleNaVerbinden(st) {
+  $("bolle-live").hidden = false;
+  $("bolle-debug").hidden = !!st.debug;
+  if (!st.debug) return bolleStand(`Verbonden (BolleOS ${st.versie || "?"}), maar de debugstand staat uit. Zet hem aan: Bolle start opnieuw op.`, "fout");
+  bolleStand(`Verbonden (BolleOS ${st.versie || "?"}, debugstand). ${manifest.naam} staat op je Bolle, bovenaan in Menu → Apps.`, "goed");
+}
+async function verbindBrowser() {
+  if (!("serial" in navigator)) return bolleStand("Deze browser kent geen Web Serial. Gebruik Chrome of Edge, of start dev met --bolle.", "fout");
+  bolle.lib ??= await import("/bolle-usb.mjs");
+  let poort = bolle.poort;
+  if (!poort) { try { poort = await navigator.serial.requestPort(); } catch { return; } }
+  try { await poort.open({ baudRate: 115200 }); } catch (e) { if (!/already open/i.test(e.message)) return bolleStand("Openen lukt niet: " + e.message, "fout"); }
+  bolle.poort = poort;
+  const schrijver = poort.writable.getWriter(), enc = new TextEncoder();
+  bolle.usb = new bolle.lib.BolleUsb((r) => schrijver.write(enc.encode(r + "\n")));
+  /* "BLOK <app-id>": Bolle opent het scherm (zonder melding); "LIJST": Bolle haalt de lijst op (met de melding, één keer) */
+  bolle.usb.on("vraag", (v) => { verversers.get(hoofdId)?.({ meld: !v.startsWith("BLOK ") }); });
+  /* op Bolle getikt (vraag, rij of knop): naar de app, zoals de broker; daarna het nieuwe blok naar Bolle */
+  bolle.usb.on("actie", async (a) => {
+    try {
+      const j = await post("/api/actie", { ...context(), ...a, op_bolle: false });
+      if (j.melding && j.melding_naar_bolle) await bolle.usb.stuurJson("melding", j.melding);
+    } catch { /* de pagina toont het niet; Bolle zegt zelf "Doorgegeven" */ }
+    verversers.get(hoofdId)?.({ meld: false });
+  });
+  bolle.modus = "browser";
+  (async () => {                                          /* regels lezen tot de poort weg is */
+    const lezer = poort.readable.pipeThrough(new TextDecoderStream()).getReader(); let rest = "";
+    try { for (;;) { const { value, done } = await lezer.read(); if (done) break; rest += value; let i; while ((i = rest.indexOf("\n")) >= 0) { bolle.usb.regel(rest.slice(0, i)); rest = rest.slice(i + 1); } } }
+    catch { /* weg */ }
+    bolle.modus = null; bolleStand("De verbinding met Bolle is weg. Start hij opnieuw op? Kies dan weer Verbind je Bolle.", "fout"); $("bolle-verbind").hidden = false;
+    try { await poort.close(); } catch { /* al dicht */ }
+  })();
+  try {
+    const st = await bolle.usb.stand();
+    if (st.debug) { await bolle.usb.stuurJson("plugin", bolle.lib.appVoorBolle(manifest)); verversers.get(hoofdId)?.({ meld: false }); }
+    $("bolle-verbind").hidden = true;
+    await bolleNaVerbinden(st);
+  } catch (e) { bolleStand(e.message, "fout"); }
+}
+async function bolleServer() {                            /* dev --bolle: de server praat met Bolle */
+  const st = await (await fetch("/api/bolle")).json();
+  if (!st.aan) return false;
+  bolle.modus = "server"; $("bolle-verbind").textContent = "Opnieuw verbinden"; $("bolle-uitleg").textContent = "dev --bolle: de server praat via USB met je Bolle.";
+  if (!st.verbonden) { bolleStand(st.fout || "Niet verbonden.", "fout"); $("bolle-debug").hidden = !/debugstand/.test(st.fout); return true; }
+  await bolleNaVerbinden(st);
+  return true;
+}
+const bolleDo = {
+  async scherm() {
+    if (bolle.modus === "browser") return bolle.usb.scherm(2);
+    const r = await fetch("/api/bolle/scherm"); if (!r.ok) throw new Error((await r.json()).fout);
+    return await createImageBitmap(await r.blob());
+  },
+  tik: (x, y) => bolle.modus === "browser" ? bolle.usb.tik(x, y) : post("/api/bolle/tik", { x, y }),
+  opdracht: (r) => bolle.modus === "browser" ? bolle.usb.opdracht(r) : post("/api/bolle/opdracht", { opdracht: r }),
+};
+$("bolle-verbind").onclick = async () => {
+  if (bolle.modus === "server" || (await fetch("/api/bolle").then((r) => r.json())).aan) {
+    bolleStand("Verbinden ..."); await post("/api/bolle/opnieuw", {}); await bolleServer(); return;
+  }
+  verbindBrowser();
+};
+$("bolle-debug").onclick = async () => {
+  await bolleDo.opdracht("DEBUG 1");
+  bolleStand("Bolle start opnieuw op in de debugstand. Wacht een paar tellen en kies dan Verbind je Bolle / Opnieuw verbinden.");
+  $("bolle-debug").hidden = true; $("bolle-verbind").hidden = false;
+};
+
+/* live meekijken: steeds het volgende plaatje zodra het vorige binnen is (~2,5 s via USB) */
+let liveAan = false, livePauze = false;
+async function liveLus() {
+  const c = $("live-scherm"), ctx = c.getContext("2d");
+  while (liveAan) {
+    if (livePauze || !bolle.modus) { await new Promise((r) => setTimeout(r, 400)); continue; }
+    try {
+      const t0 = performance.now(), f = await bolleDo.scherm();
+      if (f.rgba) { c.width = f.breed; c.height = f.hoog; ctx.putImageData(new ImageData(f.rgba, f.breed, f.hoog), 0, 0); }
+      else { c.width = f.width; c.height = f.height; ctx.drawImage(f, 0, 0); }
+      $("live-stand").textContent = `Bijgewerkt ${new Date().toLocaleTimeString("nl-NL", { hour12: false })} · ${Math.round(performance.now() - t0)} ms per beeld`;
+    } catch (e) { $("live-stand").textContent = e.message; await new Promise((r) => setTimeout(r, 1500)); }
+  }
+}
+$("bolle-live").onclick = () => { $("live").showModal(); if (!liveAan) { liveAan = true; liveLus(); } };
+$("live-dicht").onclick = () => { liveAan = false; $("live").close(); };
+$("live").addEventListener("close", () => { liveAan = false; });
+$("live-pauze").onclick = (e) => { livePauze = !livePauze; e.target.textContent = livePauze ? "Verder" : "Pauze"; };
+$("live-scherm").onclick = (e) => { const r = e.target.getBoundingClientRect(); bolleDo.tik((e.clientX - r.left) * 466 / r.width, (e.clientY - r.top) * 466 / r.height); };
+for (const k of document.querySelectorAll("#live [data-ui]")) k.onclick = () => bolleDo.opdracht(k.dataset.ui === "plugin" ? `UI menu plugin ${manifest.id}` : k.dataset.ui);
+
+(async () => {
+  const info = await (await fetch("/api/info")).json();
+  const m = info.manifest;
+  manifest = m; hoofdId = info.hoofdblok ?? null;
+  $("plugin").textContent = `${m.naam} · ${m.id} ${m.versie} · ${m.runtime?.taal}`;
+  for (const r of m.rechten ?? []) $("rechten").append(el("span", { class: "chip" }, r));
+  const rechten = new Set(m.rechten ?? []);
+  $("plek").value = info.standaard.plek || "";
+  $("rijdt").checked = info.standaard.rijdt;
+  $("instellingen").value = JSON.stringify(info.standaard.instellingen, null, 2);
+  $("plek-uitleg").textContent = rechten.has("locatie:precies") ? "Recht locatie:precies: afgerond op 3 decimalen (ca. 100 m)."
+    : rechten.has("locatie:afgerond") ? "Recht locatie:afgerond: afgerond op 2 decimalen (ca. 1 km)." : "Deze app heeft geen recht op de plek; hij gaat niet mee.";
+  $("rijdt-uitleg").textContent = rechten.has("rit:status") ? "Recht rit:status: gaat mee als rijdt." : "Geen recht rit:status: gaat niet mee (maar tools met rijden: false worden wel geweigerd).";
+  const inst = m.instellingen ?? [];
+  $("instellingen-uitleg").textContent = inst.length ? "Sleutels: " + inst.map((i) => `${i.sleutel} (${i.type})`).join(", ") : "Deze app heeft geen instellingen.";
+  const tools = m.tools ?? [];
+  $("tools").replaceChildren(...(tools.length ? tools.map(toolKaart) : [el("p", { class: "leeg-tekst" }, `Geen tools in ${info.bestand ?? "het manifest"}.`)]));
+  const blokken = m.blokken ?? [];
+  $("blokken").replaceChildren(...(blokken.length ? blokken.map(blokKaart) : [el("p", { class: "leeg-tekst" }, `Geen blokken in ${info.bestand ?? "het manifest"}.`)]));
+  await bolleServer();
+})().catch((e) => { $("plugin").textContent = "Kan de app niet laden: " + e.message; });
+</script>
+</body>
+</html>

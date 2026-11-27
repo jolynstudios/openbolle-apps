@@ -1,0 +1,11 @@
+# Je winkel. `winkel` maakt hier winkel.json van; dat adres voegen mensen toe op Bolle.
+naam: Mijn winkel
+beschrijving: Apps voor Bolle, gemaakt door mij.
+sleutel: publiek.pem          # maak hem met: npx github:jolynstudios/openbolle-apps sleutel
+# website: https://github.com/jouw-naam/mijn-accessoire
+# bron: https://github.com/jouw-naam/mijn-accessoire/tree/main
+
+# Apps uit je andere repo's in dezelfde winkel (altijd op een vaste tag of commit):
+# bronnen:
+#   - repo: https://github.com/jouw-naam/andere-app
+#     tag: v1.0.0
