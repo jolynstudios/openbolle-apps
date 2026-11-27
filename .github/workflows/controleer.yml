@@ -48,7 +48,7 @@ jobs:
       - name: tests van de apps (zonder netwerk)
         run: |
           for p in homey kilometers reisgids; do (cd apps/$p && python3 -m unittest discover -s test); done
-          for p in audi tesla; do (cd apps/$p && npm ci --no-audit --no-fund && npm test && npm run kopie); done
+          for p in tesla; do (cd apps/$p && npm ci --no-audit --no-fund && npm test && npm run kopie); done
       - name: TypeScript (sdk en sjabloon)
         run: |
           (cd sdk/typescript && npm ci && npx tsc --noEmit)

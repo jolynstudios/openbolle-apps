@@ -5,25 +5,6 @@
  "website": "https://openbolle.nl",
  "plugins": [
   {
-   "id": "audi",
-   "naam": "Audi",
-   "versie": "1.2.0",
-   "soort": "server",
-   "kort": "Bereik, tank of accu van je Audi",
-   "lang": "Zie hoe ver je Audi nog komt, hoe vol de tank of accu is, of hij op slot staat, of er een raam open is, of hij laadt en waar hij geparkeerd staat. Vraag het aan Bolle, open de app op Bolle of zie de tank of accu op je beginscherm; Bolle meldt het als je Audi klaar is met laden. Werkt met je myAudi-account (Europa), via de onofficiële weg van de myAudi-app: Audi kan die zonder waarschuwing veranderen. Alleen lezen; op slot doen of de klimaatregeling aanzetten kan nog niet. De auto wordt nooit gewekt.",
-   "categorie": "auto",
-   "auteur": "openBolle",
-   "logo": "apps/audi/logo.png",
-   "documentatie": "apps/audi/handleiding.md",
-   "voorbeelden": [
-    "Hoe ver kom ik nog met de Audi?",
-    "Staat de auto op slot?",
-    "Laadt de Audi nog?",
-    "Waar staat mijn auto?"
-   ],
-   "bron": "https://github.com/jolynstudios/openbolle-apps/tree/main/apps/audi"
-  },
-  {
    "id": "homey",
    "naam": "Homey",
    "versie": "1.2.0",

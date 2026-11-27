@@ -40,7 +40,6 @@ Create the signing key once and keep it private. Sign again after each change to
 - [Kilometers](apps/kilometers/) remembers trips for one installation.
 - [Reisgids](apps/reisgids/) looks up nearby sights with approximate location.
 - [Homey](apps/homey/) connects an account and controls home devices.
-- [Audi](apps/audi/) reads the last vehicle status from a European myAudi account.
 - [Tesla](apps/tesla/) shows battery level, range and charging status.
 
 Use the [development guide](https://openbolle.nl/docs/ontwikkelen/) for the full workflow. The [manifest schema](schema/app.schema.json) lists the accepted fields. Keep names such as `plugin.py`, `maakPlugin` and `/plugin/v1/` as written in the starter. The runtime uses those names.
